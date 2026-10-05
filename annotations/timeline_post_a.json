@@ -1,0 +1,37 @@
+{
+  "dataset": "GlowTrace-MM",
+  "case_id": "post_a_28day",
+  "scene": "商品晒单",
+  "note": "案例A的账号与时间线元数据，作为「帖子时间线与使用声明冲突」这一证据的结构化输入。",
+  "post": {
+    "platform": "小红书",
+    "account": "@油皮自救指南",
+    "account_registered": "2026-09-28",
+    "posted_at": "2026-10-02 21:14",
+    "days_since_registration": 4,
+    "claimed_trial_period_days": 28,
+    "claimed_trial_start": "2026-09-05"
+  },
+  "contradictions": [
+    {
+      "id": "A3",
+      "type": "timeline",
+      "finding": "账号注册于 2026-09-28，帖子发布于 2026-10-02，注册至今仅 4 天，但标题与正文声称完成 28 天实测；宣称的实测起始日 2026-09-05 早于账号注册日"
+    },
+    {
+      "id": "A4",
+      "type": "text_image",
+      "finding": "图文所指不是同一个产品：正文称「这个是我们实验室打样的样品瓶，我提前拿到了」并通篇讲「维C抗氧精华」，但配图（images/mismatch/post_a_28day_wrong_product.png）瓶身印的是「澜本 氨基酸洁面慕斯」；此外该图上的「国妆网备字 2026XXXXXX」为占位式编号，与「打样阶段的样品」这一说法矛盾，也无法在药监部门公开平台核实"
+    },
+    {
+      "id": "A6",
+      "type": "text_image",
+      "finding": "正文称「原相机直出，这次真的没开任何滤镜」，但配图右半侧存在磨皮与提亮痕迹（见 A1、A2），文字声明与图像事实冲突"
+    }
+  ],
+  "image_exif": {
+    "left_before": { "capture_time": "2026-09-05 08:12", "note": "声称的 Day1" },
+    "right_after": { "capture_time": "2026-10-01 09:03", "note": "声称的 Day28，与注册时间线冲突" },
+    "identical_source": false
+  }
+}

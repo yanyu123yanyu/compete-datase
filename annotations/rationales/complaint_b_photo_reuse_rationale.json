@@ -1,0 +1,60 @@
+{
+  "case_id": "complaint_b_photo_reuse",
+  "scene": "售后投诉",
+  "ground_truth": {
+    "label_type": "recycled",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "B1",
+        "type": "image",
+        "anchor": "images/tampered/complaint_b_photo_reuse.png",
+        "finding": "4条投诉的缩略图为同一张照片：泛红区域的位置与形状、发丝在额前的走向、背景瓷砖的缝隙位置在两两比对中完全一致，四格之间不存在任何构图差异（像素级差异为0）。"
+      },
+      {
+        "id": "B2",
+        "type": "metadata",
+        "anchor": "annotations/timeline_complaint_b_photo_reuse.json",
+        "finding": "四条投诉被摊到 2026-02-16 21:03、2026-02-17 09:47、2026-02-19 20:31、2026-02-21 22:06，跨度5天、相邻间隔12.7/58.7/49.6小时；发布时间不再集中在短窗口内，但只要按素材比对就能把四条串回同一组。"
+      },
+      {
+        "id": "B3",
+        "type": "metadata",
+        "anchor": "annotations/timeline_complaint_b_photo_reuse.json",
+        "finding": "四条共用的照片拍摄于 2026-02-18，而第 1 条投诉发布于 2026-02-16 21:03——照片的拍摄时间晚于第一次\"用完烂脸\"的投诉时间，时间顺序本身不成立。"
+      },
+      {
+        "id": "B4",
+        "type": "text",
+        "anchor": "texts/fake_reviews/complaint_b_photo_reuse.txt",
+        "finding": "四条正文逐句重合，差异仅出现在昵称、商品名、时间戳三处；连配图文件名都统一写成 IMG_2026-02-18_2241.jpg（拍摄于 02-18），四条用的是同一个文件。"
+      },
+      {
+        "id": "B5",
+        "type": "metadata",
+        "anchor": "annotations/timeline_complaint_b_photo_reuse.json",
+        "finding": "四条投诉面对的是四个不同品类、不同品牌的商品（水杨酸精华 / 烟酰胺修护乳 / 氨基酸洁面慕斯 / 玻尿酸面膜），却复用同一张\"自己过敏\"的照片，且四条均未提供订单号、购买截图或客服记录。"
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "低",
+    "exaggerated_claims": [],
+    "fake_endorsements": [],
+    "image_tampering_suspected": false,
+    "text_image_consistency": "不一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "投诉照片本身未见AI生成或篡改痕迹：皮肤纹理、泛红边缘、发丝与背景均自然，照片是真实拍摄的。本条的风险不来自图片真伪，而来自四条投诉重复使用同一个照片文件。",
+      "exaggeration_reason": "四条正文均未出现绝对化用语、功效宣称或伪造资质背书，因此夸大功效与虚假背书两项为空。",
+      "overall_reason": "判定的核心是素材复用：发布节奏被刻意打散到5天，账号也各不相同，单看发布时间不容易发现异常；但四条投诉的配图是同一个文件（像素级一致），正文骨架逐字相同，且该照片的拍摄日期晚于第一条投诉的发布时间——\"我用了第三天就烂脸\"在时间上不成立。四条声称的独立消费经历共享同一张照片，因此不构成独立的真实反馈，判为高风险。这条同时说明：把集中发布改成分散发布能躲过基于时间的检测，躲不过基于素材的检测。",
+      "control_comparison": "对照 complaint_b_control：真实投诉的照片唯一、时间与订单号自洽（订单号 2026020937710284，2026-02-09 下单 / 02-11 收货 / 02-12 首用 / 02-13 泛红 / 02-14 退款），且明确写出\"产品本身没问题，是我个人对香精敏感\"，不把责任推给商品。",
+      "evidence_recall_note": "应命中 B1–B5 全部5条证据锚点。"
+    },
+    "suggestions": [
+      "对这四条投诉做素材同源比对（照片哈希/感知哈希），命中同源后合并为同一工单处理，不按四条独立投诉统计差评权重。",
+      "核对照片拍摄时间与投诉发布时间的先后关系，对\"投诉早于照片拍摄\"的记录标记为叙述不成立，要求补充拍摄前的原始素材。",
+      "向四个账号限时索取订单号与购买凭证，24小时内未提供则标记\"疑似组织化差评\"，并将其对四个不同商品的评分一并冻结复核。"
+    ]
+  }
+}

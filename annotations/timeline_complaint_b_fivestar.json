@@ -1,0 +1,67 @@
+{
+  "dataset": "GlowTrace-MM",
+  "case_id": "complaint_b_fivestar",
+  "scene": "售后投诉",
+  "note": "案例B（同一场景）的第三个实例：4 条投诉分散发布、连配图也各不相同（这一版不靠照片复用），造假证据来自账号自身的历史评价——同一天、同一商品、同一个账号既给了五星好评又发了烂脸投诉。",
+  "conflicts": [
+    {
+      "id": "B1",
+      "type": "account_history",
+      "finding": "@柠檬tea 于 2026-02-18 19:02 在「澜本 氨基酸洁面慕斯 150ml」商品页发布五星好评（「已经回购第三瓶，会一直买下去」），同一天/该商品又被同一账号以「用了第三天就红肿刺痛」为由投诉——对同一商品的两条评价互斥，且时间线上「回购第三瓶」与「用了第三天就烂脸」不能同时为真"
+    },
+    {
+      "id": "B2",
+      "type": "account_history",
+      "finding": "另外三条投诉的账号（@小美不熬夜、@A护肤日记、@柒柒子）历史评价同样全是五星，且用词相近（「味道很淡，用着挺舒服的」「回购第二次了」「敷完脸不紧绷」）——这些账号此前从未给过差评，投诉出现在同一周内"
+    }
+  ],
+  "complaints": [
+    {
+      "account": "@小美不熬夜",
+      "published_at": "2026-02-16 21:03",
+      "account_created_at": "2026-01-05",
+      "product": "肌活源 水杨酸净痘精华 30ml",
+      "history_reviews": [
+        { "rating": 5, "text": "味道很淡，用着挺舒服的", "at": "2026-01-28" }
+      ],
+      "has_order_number": false
+    },
+    {
+      "account": "@A护肤日记",
+      "published_at": "2026-02-17 09:47",
+      "account_created_at": "2026-01-12",
+      "product": "肌活源 烟酰胺修护乳 100ml",
+      "history_reviews": [
+        { "rating": 5, "text": "回购第二次了", "at": "2026-02-02" }
+      ],
+      "has_order_number": false
+    },
+    {
+      "account": "@柠檬tea",
+      "published_at": "2026-02-19 20:31",
+      "account_created_at": "2026-01-20",
+      "product": "澜本 氨基酸洁面慕斯 150ml",
+      "history_reviews": [
+        { "rating": 5, "text": "已经回购第三瓶，会一直买下去", "at": "2026-02-18 19:02", "product": "澜本 氨基酸洁面慕斯 150ml" }
+      ],
+      "has_order_number": false,
+      "account_history_conflict": {
+        "same_day_review_at": "2026-02-18 19:02",
+        "same_day_review": "五星好评：已经回购第三瓶，会一直买下去",
+        "same_day_review_product": "澜本 氨基酸洁面慕斯 150ml",
+        "conflict": "同一账号先给同一商品五星好评（02-18 19:02），次日又以同一商品「用后烂脸」投诉（02-19 20:31）：两个结论不能同时成立"
+      }
+    },
+    {
+      "account": "@柒柒子",
+      "published_at": "2026-02-21 22:06",
+      "account_created_at": "2026-01-15",
+      "product": "素研集 玻尿酸补水面膜 10片",
+      "history_reviews": [
+        { "rating": 5, "text": "敷完脸不紧绷", "at": "2026-02-08" }
+      ],
+      "has_order_number": false
+    }
+  ],
+  "summary": "四条投诉分散在 5 天内发布、也都没有复用什么照片，但 4 个账号的历史评价全是五星，其中 @柠檬tea 在投诉前 25 小时刚给同一商品打过五星好评。本案考的是「跨评论、跨时间、跨商品」的账号画像比对，而不是找修图痕迹或找重复图片。"
+}

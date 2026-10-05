@@ -1,0 +1,51 @@
+{
+  "case_id": "repost_c_renamed",
+  "image": "images/tampered/repost_c_renamed_compare.png",
+  "image_size": { "width": 1600, "height": 900 },
+  "coord": "normalized",
+  "note": "box_id 与 annotations/rationales/repost_c_renamed_rationale.json 的 evidence id 一一对应。C1 是三个面板的配图区（同一组图的重复投放），C2 是账号身份信息栏（署名随时间变化），C3 是画面里最早的原创署名（微博面板的「原账号 @小鹿护肤」）。",
+  "boxes": [
+    {
+      "box_id": "C1",
+      "bbox": [0.006, 0.15, 0.988, 0.75],
+      "region_type": "recycled_photo",
+      "evidence": "整图：同一组实拍图在三个平台重复投放",
+      "confidence": 0.92
+    },
+    {
+      "box_id": "C1-小红书配图",
+      "bbox": [0.225, 0.317, 0.125, 0.367],
+      "region_type": "recycled_photo",
+      "evidence": "小红书版配图（红框）：与另两个面板逐像素一致",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "C1-抖音配图",
+      "bbox": [0.513, 0.317, 0.125, 0.367],
+      "region_type": "recycled_photo",
+      "evidence": "抖音版配图：同上",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "C1-微博配图",
+      "bbox": [0.838, 0.317, 0.125, 0.367],
+      "region_type": "recycled_photo",
+      "evidence": "微博版配图：同上",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "C2",
+      "bbox": [0.33, 0.452, 0.315, 0.034],
+      "region_type": "label",
+      "evidence": "微博面板的署名行：「@柚子不熬夜」＋「2026-03-02 20:15（原账号 @小鹿护肤）」——画面里最早的一条反而挂在原账号名下，而新昵称出现在更晚的两条上",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "C3",
+      "bbox": [0.33, 0.884, 0.31, 0.034],
+      "region_type": "text_image",
+      "evidence": "图下方的评论区说明：@木木不是林 指出「这张图 @小鹿护肤 两周前就发过吧」，作者回复「是我，原号改名了」",
+      "confidence": 0.86
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "case_id": "post_a_28day",
+  "image": "images/tampered/post_a_28day_beforeafter.png",
+  "image_size": { "width": 1200, "height": 800 },
+  "coord": "normalized",
+  "boxes": [
+    {
+      "box_id": "A1",
+      "bbox": [0.52, 0.08, 0.46, 0.84],
+      "region_type": "skin",
+      "evidence": "右半侧（像素 624–1176）脸颊皮肤区域的毛孔与绒毛纹理几乎完全消失，局部纹理方差接近 0，呈典型塑性磨皮特征；左半侧同一部位（0.01,0.09,0.48,0.84）可见密集毛孔点，两侧差异显著",
+      "confidence": 0.92
+    },
+    {
+      "box_id": "A2",
+      "bbox": [0.0, 0.0, 1.0, 1.0],
+      "region_type": "full",
+      "evidence": "左半侧（0–588px）高光位于颧骨左上缘，为灰蓝调侧逆光；右半侧（612–1200px）高光位于鼻梁正面且无侧向阴影，为暖白正面平光。两侧光源方向与色温不一致，说明并非同一次拍摄条件下获得的「前后对比」",
+      "confidence": 0.88
+    },
+    {
+      "box_id": "A5",
+      "bbox": [0.25, 0.64, 0.42, 0.28],
+      "region_type": "label",
+      "evidence": "该区域同时覆盖左右两支瓶子的瓶盖与标签（左瓶像素 x 330–426、白色压泵盖 y 495–532；右瓶像素 x 678–774、黑色旋盖 y 495–532）：瓶身文字相同、仅瓶盖不同（左：白色压泵；右：黑色旋盖），高光位置也不同，却在同一帖内被称为「同一瓶用了 28 天」；可结合 A1 的磨皮区域共同观察。两盖亮度实测左 245 / 右 42（差 203），见 tools/evidence_check.py 的 A5 项",
+      "confidence": 0.69
+    },
+    {
+      "box_id": "A6",
+      "bbox": [0.49, 0.60, 0.31, 0.12],
+      "region_type": "full",
+      "evidence": "画面中部（像素 596–604）存在 8px 竖直深色分隔线，其左侧另有 4px 红色描边（像素 588–592），两侧肤色与亮度在分隔线处出现不连续跳变，为后期拼接痕迹",
+      "confidence": 0.85
+    }
+  ],
+  "note": "本文件只标注「可被像素与几何验证的篡改区域」，因此 box_id 只出现 A1/A2/A5/A6，与 rationales/post_a_28day_rationale.json 的 evidence id 是交错的：rationale 的 A3（时间线元数据，见 annotations/timeline_post_a.json）与 A4（图文所指不是同一个产品）由 texts/ 与 annotations/ 下的其它文件承载，不是本文件里的像素篡改框。A5 的 y 范围 0.64–0.92（像素 512–736）刻意同时容纳瓶盖与标签；瓶盖的真实包围盒为 (693,482,758,543)，是 product_bottle() 的返回值，不要按公式推算。"
+}

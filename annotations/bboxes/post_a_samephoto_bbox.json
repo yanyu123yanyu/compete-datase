@@ -1,0 +1,44 @@
+{
+  "case_id": "post_a_samephoto",
+  "image": "images/tampered/post_a_samephoto_sidebyside.png",
+  "image_size": { "width": 1200, "height": 800 },
+  "coord": "normalized",
+  "note": "box_id 与 annotations/rationales/post_a_samephoto_rationale.json 的 evidence id 一一对应。本案的核心证据是「A1 两侧底图逐像素相同」，它对应两个框（左半 / 右半）；A2 是全图色调与光照的线性偏移；A4 是两侧的日期标注（声称相隔 28 天）。本案没有可指认的「局部篡改区域」，因为造假方式是整体套滤镜而非局部修图——这一点本身就是与 post_a_28day 的区别。",
+  "boxes": [
+    {
+      "box_id": "A1-左半",
+      "bbox": [0.1675, 0.1225, 0.2967, 0.6750],
+      "region_type": "skin",
+      "evidence": "左侧「Day 1」照片区域：底图纹理由固定随机种子渲染，与右侧共用同一批毛孔点与痘印坐标",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "A1-右半",
+      "bbox": [0.5450, 0.1225, 0.2967, 0.6750],
+      "region_type": "skin",
+      "evidence": "右侧「Day 28」照片区域：把两侧亮度归一化后，毛孔点与痘印的**位置与形状逐个重合**，差异只剩整体亮度与色温——这是同一张照片被套了滤镜的典型特征",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "A2",
+      "bbox": [0.0, 0.0, 1.0, 1.0],
+      "region_type": "skin",
+      "evidence": "全图：两侧背景（墙角、门、挂钟、地面）完全一致，只有整体亮度与色温被线性抬高；真实的前后对比照即使在同一位置拍摄，也会留下曝光、白平衡与阴影方向的细微差异",
+      "confidence": 0.88
+    },
+    {
+      "box_id": "A4-左日期",
+      "bbox": [0.2258, 0.0575, 0.1217, 0.0425],
+      "region_type": "label",
+      "evidence": "左侧标注「Day 1 · 2026-09-05」",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "A4-右日期",
+      "bbox": [0.6025, 0.0575, 0.1267, 0.0425],
+      "region_type": "label",
+      "evidence": "右侧标注「Day 28 · 2026-10-01」：与左侧声称相隔 28 天，但与账号注册时间线（注册 2026-09-29、发帖 2026-10-01）冲突",
+      "confidence": 0.90
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "dataset": "GlowTrace-MM",
+  "case_id": "post_a_samephoto",
+  "scene": "商品晒单",
+  "note": "案例A（同一场景）的第二个实例：造假手法不是修图，而是「同一张照片用两次 + 右侧套滤镜」，再配上自称的 28 天实测。本文件是「时间线矛盾」这一证据的结构化输入。",
+  "post": {
+    "platform": "小红书",
+    "account": "@小鹿的日常号",
+    "account_registered": "2026-09-29",
+    "posted_at": "2026-10-01 20:47",
+    "days_since_registration": 2,
+    "claimed_trial_period_days": 28,
+    "claimed_trial_start": "2026-09-05",
+    "claimed_second_shot": "2026-10-01"
+  },
+  "contradictions": [
+    {
+      "id": "A1",
+      "type": "text_image",
+      "finding": "标题称「28 天皮肤变化记录」，但账号注册于 2026-09-29、帖子发布于 2026-10-01，注册至今只有 2 天；正文声称的第 1 天存档（2026-09-05）比账号注册日早 24 天"
+    },
+    {
+      "id": "A2",
+      "type": "text_image",
+      "finding": "正文称「同一部手机、同一个位置、同样的灯」，且图片右下角自己标注了「同一部手机 · 同一个位置」；但画面两侧的差异是整体亮度与色温的线性偏移，而不是皮肤状态的变化"
+    }
+  ],
+  "image_exif": {
+    "available": false,
+    "note": "两个半张都来自同一个合成文件，没有独立 EXIF；即便在真实场景里，这类「自拍对比」也常常在发布前被去掉了元数据，所以本案不把 EXIF 当作主要证据，主要证据是「两侧底图逐像素相同」这一像素级事实。",
+    "left_half": { "claimed_capture_time": "2026-09-05 08:12", "note": "声称的 Day1" },
+    "right_half": { "claimed_capture_time": "2026-10-01 09:03", "note": "声称的 Day28" }
+  },
+  "related": {
+    "same_scene_other_case": "post_a_28day",
+    "difference": "post_a_28day 用的是「磨皮 + 拼接缝合成的假对比」；本案用的是「同一底图 + 整体滤镜」。两者都能被同一套鉴真流程抓出来，但留下的痕迹不同。"
+  }
+}

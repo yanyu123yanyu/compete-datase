@@ -1,0 +1,54 @@
+{
+  "case_id": "repost_c_renamed",
+  "scene": "跨平台搬运",
+  "ground_truth": {
+    "label_type": "reposted",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "C1",
+        "type": "image",
+        "anchor": "images/tampered/repost_c_renamed_compare.png#box-C1-微博配图",
+        "finding": "三个面板红框区域内的商品图逐像素一致（瓶身反光、桌面木纹、噪点分布相同），三张图是同一组实拍素材；红框外没有任何水印，也没有裁切留下的像素带。"
+      },
+      {
+        "id": "C2",
+        "type": "metadata",
+        "anchor": "annotations/provenance_repost_c_renamed.json",
+        "finding": "画面上最早的一条是微博 2026-03-02 20:15，署名\"（原账号 @小鹿护肤）\"；后出现的小红书 2026-03-08 19:40 与抖音 2026-03-12 21:15 才使用新昵称 @小雨的梳妆台，且这两个账号的注册时间（2026-02-26、2026-03-01）都晚于微博那条的发布时间。"
+      },
+      {
+        "id": "C3",
+        "type": "image",
+        "anchor": "annotations/bboxes/repost_c_renamed_bbox.json#box-C2",
+        "finding": "三个面板的头像完全相同，昵称却随平台变化（微博 @柚子不熬夜、小红书与抖音 @小雨的梳妆台）——头像没换说明是同一运营者，昵称变化说明在刻意切分身份。"
+      },
+      {
+        "id": "C4",
+        "type": "text_image",
+        "anchor": "annotations/bboxes/repost_c_renamed_bbox.json#box-C3",
+        "finding": "抖音评论区 @木木不是林 指出\"这张图 @小鹿护肤 两周前就发过吧\"，作者回复\"是我，原号改名了\"——作者承认了素材同源，但没有解释为什么改名后要在三个平台重复投放同一组图，并把旧号的发布时间沿用到新号的时间线上。"
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "低",
+    "exaggerated_claims": [],
+    "fake_endorsements": [],
+    "image_tampering_suspected": false,
+    "text_image_consistency": "一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "图片为真实拍摄，未见AI生成或篡改痕迹，水印也被清理得比较干净。本案例的判定不依赖图片真伪，而依赖身份与时间的对应关系。",
+      "exaggeration_reason": "三个版本均未出现绝对化用语或功效宣称，因此夸大功效与虚假背书两项为空。",
+      "overall_reason": "判定的核心是\"换号不换图\"：昵称、账号、水印都换了，头像没换、底图没换，发布时间与账号注册时间互相矛盾（画面里最早的一条挂在\"原账号\"名下，而使用新昵称的两个账号是之后才注册的）。作者在评论里承认了改名，说明这不是盗用他人内容，而是同一运营者用多账号重复投放同一内容、制造多来源证明的假象——对平台而言仍然属于重复内容冒充多份独立原创，因此判为高风险。",
+      "control_comparison": "对照 repost_c_control：真实跨平台同步会在主页与正文明确\"全网同名\"、主动注明首发平台，且每个平台会重新裁切配图；本案例既不注明也重新裁切，却换了昵称与账号。",
+      "evidence_recall_note": "应命中 C1–C4 全部4条证据锚点。"
+    },
+    "suggestions": [
+      "把三个面板的图片录入同源指纹库，命中同一组图后按\"多账号同素材\"合并统计，而不是按三个独立创作者分别计算权重。",
+      "核对账号注册时间与内容发布时间的先后，对\"新注册账号发布更早的旧内容\"的情形要求提供原始发布链接或原始拍摄文件。",
+      "对同一头像、不同昵称、发布相同素材的账号做关联识别，关联后在账号主页提示\"该账号与 @小鹿护肤 存在关联关系\"，并限制这些账号在同类目下的重复曝光。"
+    ]
+  }
+}

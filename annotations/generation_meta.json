@@ -1,0 +1,134 @@
+{
+  "dataset": "GlowTrace-MM",
+  "generator": "Pillow 12.3.0（本地合成，非真实抓取）",
+  "note": "本文件记录每张合成图的生成方式与造假手法，用于可复现性与可审计性。合成图中出现的品牌名、账号名、用户昵称均为虚构，与真实品牌和个人无关。所有图由 tools/make_images.py 生成，尺寸与 annotations/bboxes/*.json 的 image_size 严格一致，生成后不要裁切或缩放。",
+  "images": [
+    {
+      "path": "images/tampered/post_a_28day_beforeafter.png",
+      "canvas": { "width": 1200, "height": 800 },
+      "case_id": "post_a_28day",
+      "bbox_file": "annotations/bboxes/post_a_28day_bbox.json",
+      "fabrication": [
+        "左半图为原图：多层同心椭圆叠加出肤色与光比，保留可见毛孔点（半径 2–3px 的深色小点），背景为冷调阴天侧逆光（画面左上高光）",
+        "右半图为同一张脸经高斯模糊（半径 2.4）磨掉毛孔点 + 整体提亮，毛孔纹理方差接近 0",
+        "右半图光源改为正面平光暖白，与左半图光源方向不一致，构成「拍摄条件差异」的可测证据",
+        "中间加 8px 深色竖直分隔线 + 4px 红色描边，制造「左before / 右after」的对比暗示",
+        "左右两瓶产品的外形不同（左：白色泵头；右：黑色旋盖），并不是同一支产品"
+      ],
+      "detectable_traces": [
+        "A1 右侧皮肤区域纹理方差显著低于左侧同区域（左侧可见毛孔点）",
+        "A2 左右两侧光照方向不一致（左侧高光偏左上，右侧为均匀正面光）",
+        "A5 左右两侧产品瓶盖颜色不同（白泵头 vs 黑旋盖），不是同一支产品",
+        "拼接处存在 8px 深色分隔线与红色描边，属二次拼接痕迹"
+      ]
+    },
+    {
+      "path": "images/ai_generated/post_a_28day_unboxing.png",
+      "canvas": { "width": 1024, "height": 1024 },
+      "case_id": "post_a_28day",
+      "bbox_file": "annotations/bboxes/post_a_28day_bbox.json",
+      "fabrication": [
+        "整张图为合成：背景为暖色渐变纸面（上浅下深），前景放一个斜开的开箱纸盒与一支立式精华瓶，纸盒内衬为粉色",
+        "瓶身标签为程序排版的「烟酰胺 / 控油精华 / NIACINAMIDE 10% / 净含量 30ml」，其上再叠一行过密的英文小字「DERMATOLOGICALLY TESTED · HYPOALLERGENIC」",
+        "右下角标注「AI 生成 · 演示用」，明确本图不是真实拍摄"
+      ],
+      "detectable_traces": [
+        "纸盒开口处只是一条浅色边（像素 y≈474–480），没有箱盖翻折结构，不符合真实开箱照片的纸盒形态",
+        "瓶身英文小字「DERMATOLOGICALLY TESTED · HYPOALLERGENIC」在 1024px 画布上字高仅 7px，行高不足、字符粘连不可读，属生成式内容的典型特征",
+        "整图没有可核实的拍摄时间戳、机型 EXIF 或场景细节（无桌面杂物、无反光）",
+        "瓶身上的中文名「烟酰胺 / 控油精华」与配套文案宣称的「维C抗氧精华」不是同一个产品（见 A4）"
+      ]
+    },
+    {
+      "path": "images/mismatch/post_a_28day_wrong_product.png",
+      "canvas": { "width": 1024, "height": 1024 },
+      "case_id": "post_a_28day",
+      "bbox_file": "annotations/bboxes/post_a_28day_bbox.json",
+      "fabrication": [
+        "合成瓶身标签写「澜本 氨基酸洁面慕斯 / AMINO ACID」，卖点是「温和清洁 · 敏感肌可用」",
+        "瓶身下方加一行编造的备案号样式小字「国妆网备字 2026XXXXXX」",
+        "而配套文案（texts/fake_reviews/post_a_28day.txt）通篇宣称「维C抗氧精华」，制造图文语义矛盾",
+        "配图说明文件为 texts/mismatched_prompts/post_a_28day_wrong_caption.txt"
+      ],
+      "detectable_traces": [
+        "A4 图片上的产品是洁面慕斯（氨基酸），文案宣称的是维C抗氧精华，图文所指不是同一个产品",
+        "A4 图上的备案号「2026XXXXXX」为占位符，无法在药监局平台核实",
+        "图上卖点「温和清洁」与文案卖点「提亮肤色」属于不同品类的功效主张"
+      ]
+    },
+    {
+      "path": "images/tampered/complaint_b_multiaccount_wall.png",
+      "canvas": { "width": 1200, "height": 1600 },
+      "case_id": "complaint_b_recycled",
+      "bbox_file": "annotations/bboxes/complaint_b_bbox.json",
+      "fabrication": [
+        "把 4 条投诉并排铺在一张画布上，按发布时间从上到下排序",
+        "4 条的配图由同一段绘制代码 + 固定随机种子（4242）生成，因此四格像素完全一致",
+        "每条卡片的配图行统一标注为同一文件名 IMG_2026-02-18_2241.jpg（四条共用一张图）",
+        "文案骨架完全一致，只替换昵称与商品名，对应 4 个不同商品",
+        "第 3 格（@柠檬tea）额外标出「历史评价全五星」，与当天 19:02 的五星好评相互印证"
+      ],
+      "detectable_traces": [
+        "B1 四格缩略图的像素内容完全一致（同一张照片被 4 个账号分别当作自己的遭遇）",
+        "B2 4 条发布时间集中在 2026-02-18 的 47 分钟内（22:41 / 22:58 / 23:12 / 23:28，间隔 17/14/16 分钟）",
+        "B3 4 条文案骨架一致，仅替换昵称与商品名（B3 的锚点在 texts/fake_reviews/complaint_b_four_accounts.txt）",
+        "B4 @柠檬tea 当天 19:02 的五星好评与当晚 23:12 的投诉叙事冲突",
+        "B5 4 条均未提供订单号，无法核实购买关系"
+      ]
+    },
+    {
+      "path": "images/tampered/repost_c_platform_comparison.png",
+      "canvas": { "width": 1600, "height": 900 },
+      "case_id": "repost_c_platform",
+      "bbox_file": "annotations/bboxes/repost_c_bbox.json",
+      "sidecar": "images/tampered/repost_c_source_watermarked.png（由本图左侧面板裁切，500×675）",
+      "fabrication": [
+        "同一张测评图并排放进三个平台的界面骨架：小红书（左，2026-03-02 20:15）、抖音（中，2026-03-09 21:40）、微博（右，2026-03-15 19:05）",
+        "左侧面板保留原始水印「@美妆阿May · 拍摄花絮 · 原图直发」",
+        "中间面板在原水印位置加红框并标注「原水印被裁掉（此处为空）」，并在面板左边缘加一条 6px 残留像素带（裁切后留下的边）；头像换成另一个人",
+        "右侧面板用圆角贴纸「今日份好物 / 整理自网络 · 侵删」盖住原水印位置，头像换成猫图",
+        "三版正文逐字相同（编辑距离 0）"
+      ],
+      "detectable_traces": [
+        "C1 三个面板的测评图画面同源（同一张素材的瓶身反光、高光位置与桌面木纹走向完全一致）",
+        "C2 抖音面板原水印位置为空、左边缘残留 6px 像素带（裁切痕迹）；对照左侧面板右下角的原始水印",
+        "C3 微博面板原水印位置被圆角贴纸覆盖（锚点在图片，发布顺序证据见 C5）",
+        "C4 三版正文逐字相同，编辑距离 0，与「各自独立测评」的声称不符",
+        "C5 发布时间严格单向递增（03-02 → 03-09 → 03-15），且后两个账号的注册时间均晚于首发时间"
+      ]
+    }
+  ],
+  "control_images": [
+    {
+      "path": "images/real/post_a_28day_control.jpg",
+      "canvas": { "width": 800, "height": 1180 },
+      "case_id": "post_a_28day_control",
+      "note": "负样本示意图：一条真实开箱笔记长什么样——有发布时间、有型号，正文主动标注「品牌方寄的样品，没收钱」，并写出缺点（鼻翼起皮）。对应 texts/real_reviews/post_a_28day_control.txt。"
+    },
+    {
+      "path": "images/real/complaint_b_control.jpg",
+      "canvas": { "width": 800, "height": 1180 },
+      "case_id": "complaint_b_control",
+      "note": "负样本示意图：一条真实投诉长什么样——照片唯一、有订单号、有客服受理与退款时间线、时间分散，且明确说明「产品本身没问题，是我个人对香精敏感」。对应 texts/real_reviews/complaint_b_control.txt。"
+    },
+    {
+      "path": "images/real/repost_c_control.jpg",
+      "canvas": { "width": 1200, "height": 900 },
+      "case_id": "repost_c_control",
+      "note": "负样本示意图：真实跨平台同步长什么样——三平台同名同头像、首发平台主动标注「小红书首发」、其余平台写「同步更新」、正文按平台略有改写。对应 texts/real_reviews/repost_c_control.txt。"
+    }
+  ],
+  "tigas_copies": [
+    {
+      "path": "images/real/tigas_real_face_00002.jpeg",
+      "source": "TIGAS_data/real/00002.jpeg",
+      "note": "比赛提供数据，直接复制，不做任何处理。"
+    },
+    {
+      "path": "images/ai_generated/tigas_fake_face_000907.jpeg",
+      "source": "TIGAS_data/fake/image-2019-02-17_000907.jpeg",
+      "note": "比赛提供数据，直接复制，不做任何处理。"
+    }
+  ],
+  "reproduce": "python tools/make_images.py --root GlowTrace-MM --tigas <TIGAS_data 目录>，随后 python tools/verify_dataset.py --root GlowTrace-MM 校验尺寸与锚点。"
+}

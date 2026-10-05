@@ -1,0 +1,67 @@
+{
+  "dataset": "GlowTrace-MM",
+  "case_id": "complaint_b_photo_reuse",
+  "scene": "售后投诉",
+  "note": "案例B（同一场景）的第二个实例：造假者把 4 条投诉摊到 5 个日期上，以为绕开了「同一时段集中发布」这条规则，但四条用的是同一个照片文件，而且该文件的拍摄日期晚于第一条投诉的发布时间。",
+  "shared_photo": {
+    "path": "images/tampered/complaint_b_photo_reuse.png",
+    "md5": "15df4c611420e16b4eef7664a6cf17da",
+    "md5_note": "该 MD5 是整张投诉墙图（含页面骨架，1200x1600）的真实哈希，两次生成一致；四条共用的那张照片就是墙图四格里由同一段绘制代码 + 固定种子 4242 渲染出的缩略图区块，四格像素完全一致。若要只对照片本身取哈希，需从 (40, y+10, 260, y+0.19*1600-20) 裁剪（y 取 0.06/0.27/0.48/0.69 × 1600）。",
+    "reuse_count": 4,
+    "photo_captured_at": "2026-02-18",
+    "note": "配图文件名 IMG_2026-02-18_2241.jpg 表明拍摄于 2026-02-18，而第一条投诉发布于 2026-02-16 21:03 —— 用「今天早上拍的」这张照片去投诉，在时间上不可能成立（发布在前、拍照在后）"
+  },
+  "spread_window_days": 5,
+  "complaints": [
+    {
+      "account": "@小美不熬夜",
+      "published_at": "2026-02-16 21:03",
+      "account_created_at": "2026-01-05",
+      "product": "肌活源 水杨酸净痘精华 30ml",
+      "photo_md5": "15df4c611420e16b4eef7664a6cf17da",
+      "photo_md5_note": "与另外三条为同一个照片文件（像素一致），此处记录的是其所在容器图的哈希",
+      "photo_captured_at": "2026-02-18",
+      "has_order_number": false,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "note": "发布时间早于照片拍摄日期 2 天，正文却称照片是「今天早上洗完脸拍的」"
+    },
+    {
+      "account": "@A护肤日记",
+      "published_at": "2026-02-17 09:47",
+      "account_created_at": "2026-01-12",
+      "product": "肌活源 烟酰胺修护乳 100ml",
+      "photo_md5": "15df4c611420e16b4eef7664a6cf17da",
+      "photo_md5_note": "同一个文件",
+      "photo_captured_at": "2026-02-18",
+      "has_order_number": false,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "note": "与前一条相隔 12 小时 44 分，正文骨架一致；照片尚未「拍摄」"
+    },
+    {
+      "account": "@柠檬tea",
+      "published_at": "2026-02-19 20:31",
+      "account_created_at": "2026-01-20",
+      "product": "澜本 氨基酸洁面慕斯 150ml",
+      "photo_md5": "15df4c611420e16b4eef7664a6cf17da",
+      "photo_md5_note": "同一个文件",
+      "photo_captured_at": "2026-02-18",
+      "has_order_number": false,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "note": "照片拍摄于前一天，本条的时间线自身不算矛盾，但配图与另外三条完全相同"
+    },
+    {
+      "account": "@柒柒子",
+      "published_at": "2026-02-21 22:06",
+      "account_created_at": "2026-01-15",
+      "product": "素研集 玻尿酸补水面膜 10片",
+      "photo_md5": "15df4c611420e16b4eef7664a6cf17da",
+      "photo_md5_note": "同一个文件",
+      "photo_captured_at": "2026-02-18",
+      "has_order_number": false,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "note": "照片拍摄于 3 天前，正文仍称「今天早上拍的」"
+    }
+  ],
+  "interval_hours": [12.7, 58.7, 49.6],
+  "summary": "4 个账号在 5 天内陆续发布骨架一致的四条投诉，无一条提供订单号；四条配图是同一个文件，且该文件拍摄于 2026-02-18——晚于前两条的发布时间。把「集中发布」改成「分散发布」只是换了个包装，照片复用这一条硬证据没有被改掉。"
+}

@@ -1,0 +1,70 @@
+{
+  "dataset": "GlowTrace-MM",
+  "case_id": "post_a_samephoto",
+  "scene": "商品晒单",
+  "manufacturing": "同一张自拍照用两次冒充 28 天前后对比，右侧套一层暖色滤镜；账号注册 2 天的新号自称完成了 28 天实测",
+  "ground_truth": {
+    "label_type": "tampered",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "A1",
+        "type": "image",
+        "anchor": "images/tampered/post_a_samephoto_sidebyside.png#box-A1-右半",
+        "finding": "两侧的「照片」是同一张底图：把右侧整体亮度归一化后，毛孔点、痘印的位置与形状逐个重合（画面里那 5 处较大的红肿痘印在两边的相对坐标一致）。真实相隔 28 天的两张自拍不可能出现这种重合，最直接的解释是同一张图被用了两次。",
+        "confidence": 0.95
+      },
+      {
+        "id": "A2",
+        "type": "image",
+        "anchor": "images/tampered/post_a_samephoto_sidebyside.png#box-A2",
+        "finding": "两侧的「变化」只是整体亮度 + 暖色调的线性偏移：背景里的墙角、门、挂钟、地面在两边完全一致，阴影方向与曝光没有变化；右侧的提亮是均匀作用于整幅画面的，连背景一起被抬亮了——真实拍摄条件差异不会让背景和面部得到完全相同的偏移量。",
+        "confidence": 0.88
+      },
+      {
+        "id": "A3",
+        "type": "metadata",
+        "anchor": "annotations/timeline_post_a_samephoto.json",
+        "finding": "账号 @小鹿的日常号 注册于 2026-09-29，帖子发布于 2026-10-01 20:47，注册至今只有 2 天；正文声称「第 1 天（2026-09-05）存档」，该日期比账号注册日早 24 天——时间线自相矛盾，「28 天记录」不可能成立。",
+        "confidence": 0.93
+      },
+      {
+        "id": "A4",
+        "type": "text_image",
+        "anchor": "images/tampered/post_a_samephoto_sidebyside.png#box-A4-右日期",
+        "finding": "图片自带日期标注（左「Day 1 · 2026-09-05」、右「Day 28 · 2026-10-01」），与自己贴的「28 天皮肤变化记录」呼应；但正文又说「这次我全程没有换护肤品」，全篇没有出现任何具体产品——所谓「晒单」既没晒单、也没有可追溯的使用记录。",
+        "confidence": 0.86
+      },
+      {
+        "id": "A5",
+        "type": "text_internal",
+        "anchor": "texts/fake_reviews/post_a_samephoto.txt#第4段",
+        "finding": "正文称「同样的位置、同样的灯，左边右边是同一部手机拍的」，并主动把「同一部手机 · 同一个位置」印在图上——声明越具体，与「两侧底图完全一致」这一事实放在一起就越矛盾：既然是完全一样的两张图，就不存在「拍了两天」这件事。",
+        "confidence": 0.84
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "低",
+    "exaggerated_claims": [
+      "28 天皮肤变化记录（实际账号仅注册 2 天）",
+      "肤色亮了一度、红肿痘淡下去（结论由滤镜差异支撑，非真实变化）",
+      "全程没有换护肤品（暗示变化来自某种方法，但未说明任何产品）"
+    ],
+    "fake_endorsements": [],
+    "image_tampering_suspected": true,
+    "text_image_consistency": "不一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "画面本身是普通自拍照风格（卡通化的示意图），没有 AI 生成图像常见的纹理异常；本案不是 AI 生成图，而是「真图被重复使用」——判定重点不在这里。",
+      "exaggeration_reason": "以「28 天实测」为卖点，但时间线只有 2 天；「变化明显」的说法完全由右侧滤镜支撑，且全篇没有任何产品信息，是典型的只做效果图、不承担责任的说法。",
+      "overall_reason": "综合判定为高风险：像素级证据表明两侧是同一张照片（A1），差异只是整体滤镜（A2）；时间线（A3）与图文关系（A4、A5）进一步否定「28 天实测」的成立条件。本案的造假不是「局部修图」，而是「同一张图用两次 + 换滤镜」，Agent 需要靠跨半图比对而不是靠找修图痕迹来发现。"
+    },
+    "suggestions": [
+      "要求作者提供两张照片的原始文件（含拍摄时间），或提供中间过程的连续记录",
+      "把「前后对比」类内容纳入统一检查：先做跨图/跨半图相似度比对，再看是否存在整体色调偏移",
+      "对注册 7 天内的新账号 + 声称长期实测（≥14 天）的组合直接降权",
+      "在商品晒单类内容中强制要求标注产品或成分信息，无产品信息的「效果记录」不计入种草权重"
+    ]
+  }
+}

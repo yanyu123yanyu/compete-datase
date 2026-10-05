@@ -1,0 +1,71 @@
+{
+  "case_id": "complaint_b_recycled",
+  "image": "images/tampered/complaint_b_multiaccount_wall.png",
+  "text": "texts/fake_reviews/complaint_b_four_accounts.txt",
+  "shared_photo": {
+    "path": "images/tampered/complaint_b_multiaccount_wall.png",
+    "md5": "beab4f4a2d2987a23a19829e17d48c4b",
+    "md5_note": "已回填（按磁盘上的图片实时取值）：这是 images/tampered/complaint_b_multiaccount_wall.png 的真实 MD5。四条共用的那张照片就是这张墙图里的缩略图区块，由同一段绘制代码 + 固定种子 4242 渲染，四格像素完全一致（tools/evidence_check.py 的 B1 断言实测两两差异 0.0000%），因此这一个哈希即可代表四条共用的照片；若要单张照片的哈希，需先把缩略图裁出来另存再取哈希。",
+    "reuse_count": 4,
+    "note": "投诉墙截图中4张缩略图引用的是同一个照片文件，4张之间像素完全一致（构图、泛红区域、发丝走向、背景瓷砖缝隙位置一致）；该墙面图本身即 CSV 中 complaint_b_multiaccount_wall.png 与各条投诉共用的同源照片"
+  },
+  "photo_md5_identical": true,
+  "concentration_window_minutes": 47,
+  "complaints": [
+    {
+      "account": "@小美不熬夜",
+      "published_at": "2026-02-18 22:41",
+      "account_created_at": "2026-01-05",
+      "product": "肌活源 水杨酸净痘精华 30ml",
+      "photo_md5": null,
+      "photo_md5_note": "与另外三条为同一张照片（像素一致），真实哈希待生成后统一回填到 shared_photo.md5",
+      "has_order_number": false,
+      "order_number": null,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "note": "未提供订单号、购买截图或客服对话记录"
+    },
+    {
+      "account": "@A护肤日记",
+      "published_at": "2026-02-18 22:58",
+      "account_created_at": "2026-01-12",
+      "product": "肌活源 烟酰胺修护乳 100ml",
+      "photo_md5": null,
+      "photo_md5_note": "与另外三条为同一张照片（像素一致），真实哈希待生成后统一回填到 shared_photo.md5",
+      "has_order_number": false,
+      "order_number": null,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "note": "与上一条相隔17分钟，正文骨架一致"
+    },
+    {
+      "account": "@柠檬tea",
+      "published_at": "2026-02-18 23:12",
+      "account_created_at": "2026-01-20",
+      "product": "澜本 氨基酸洁面慕斯 150ml",
+      "photo_md5": null,
+      "photo_md5_note": "与另外三条为同一张照片（像素一致），真实哈希待生成后统一回填到 shared_photo.md5",
+      "has_order_number": false,
+      "order_number": null,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "account_history_conflict": {
+        "same_day_review_at": "2026-02-18 19:02",
+        "same_day_review": "五星好评：已经回购第三瓶，会一直买下去",
+        "same_day_review_product": "澜本 氨基酸洁面慕斯 150ml",
+        "conflict": "同一天内先给「澜本 氨基酸洁面慕斯 150ml」五星好评（19:02）、再发同一商品的\"用后烂脸\"投诉（23:12），两个结论不能同时成立"
+      }
+    },
+    {
+      "account": "@柒柒子",
+      "published_at": "2026-02-18 23:28",
+      "account_created_at": "2026-01-15",
+      "product": "素研集 玻尿酸补水面膜 10片",
+      "photo_md5": null,
+      "photo_md5_note": "与另外三条为同一张照片（像素一致），真实哈希待生成后统一回填到 shared_photo.md5",
+      "has_order_number": false,
+      "order_number": null,
+      "supporting_materials": ["同一张过敏红肿照片"],
+      "note": "与上一条相隔16分钟，正文骨架一致"
+    }
+  ],
+  "interval_minutes": [17, 14, 16],
+  "summary": "4个账号在47分钟内用同一张照片发布了骨架一致的四条投诉，无一条提供订单号，@柠檬tea 当天还存在反向评价。"
+}

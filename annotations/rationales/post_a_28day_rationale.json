@@ -1,0 +1,73 @@
+{
+  "case_id": "post_a_28day",
+  "scene": "商品晒单",
+  "ground_truth": {
+    "label_type": "ai_generated",
+    "secondary_label_type": "mismatch",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "A1",
+        "type": "image",
+        "anchor": "images/tampered/post_a_28day_beforeafter.png#box-A1",
+        "finding": "右半侧皮肤毛孔纹理被磨皮抹除，纹理方差接近 0；左半侧同部位纹理正常，构成局部修图痕迹"
+      },
+      {
+        "id": "A2",
+        "type": "image",
+        "anchor": "images/tampered/post_a_28day_beforeafter.png#box-A2",
+        "finding": "左右两侧光源方向与高光位置不一致，属于不同拍摄条件，无法作为有效的前后对比证据"
+      },
+      {
+        "id": "A3",
+        "type": "metadata",
+        "anchor": "annotations/timeline_post_a.json",
+        "finding": "账号注册 2026-09-28，发帖 2026-10-02，仅相隔 4 天，却声称完成 28 天实测；宣称的实测起始日早于账号注册日"
+      },
+      {
+        "id": "A4",
+        "type": "text_image",
+        "anchor": "images/mismatch/post_a_28day_wrong_product.png",
+        "finding": "图文所指不是同一个产品：配图瓶身标签为「澜本 氨基酸洁面慕斯 / AMINO ACID」（温和清洁），文案却称「维C抗氧精华」（提亮肤色）；且图中备案号样式「国妆网备字 2026XXXXXX」为占位式编号，无法在药监部门公开平台核实"
+      },
+      {
+        "id": "A5",
+        "type": "text_image",
+        "anchor": "images/tampered/post_a_28day_beforeafter.png#box-A5",
+        "finding": "左半侧与右半侧的产品并非同一支（左白泵头、右黑旋盖，高光位置也不同），与文案「同一瓶用了 28 天，中间没有换过任何护肤品」直接矛盾"
+      },
+      {
+        "id": "A6",
+        "type": "text_internal",
+        "anchor": "texts/fake_reviews/post_a_28day.txt#第3段",
+        "finding": "文案自称「右边是今天早上原相机直出（这次真的没开任何滤镜！）」，但同一张配图的右半侧存在磨皮与整体提亮痕迹（见 A1），文字声明与图像事实冲突"
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "高",
+    "exaggerated_claims": [
+      "「28天从痘痘脸到被同事问是不是做了医美」：以医美效果类比化妆品功效，暗示达到医疗美容级别的改善，超出化妆品功效边界",
+      "「比某蓝之谜还猛」：与其他品牌做贬损性对比，属《广告法》限制的比较性宣传",
+      "疗效化表述「痘痘脸」改善属功效宣称，但未提供任何检测报告或功效评价依据"
+    ],
+    "fake_endorsements": [
+      "宣称「我们实验室打样的样品瓶，我提前拿到了」，暗示存在实验室背书，但全文未提供任何机构名称、检测报告编号或功效评价依据；且配图上的备案号样式「国妆网备字 2026XXXXXX」无法在药监部门公开平台核实（占位式编号），与「提前拿到的打样品」这一说法互相矛盾"
+    ],
+    "image_tampering_suspected": true,
+    "text_image_consistency": "不一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "文案结构高度模板化（打卡标题 + 对比图 + 成分党话术 + 逼单结尾），缺少任何具体使用细节（用量、手法、出现过的反应）；配图右半侧存在磨皮提亮与拼接痕迹（A1、A2），开箱图与矛盾图的瓶身与配文所指产品不一致（A4），符合生成式内容特征。",
+      "exaggeration_reason": "「28天从痘痘脸到被同事问是不是做了医美」将化妆品效果与医美效果并列，属疗效暗示；「比某蓝之谜还猛」构成对竞品的贬损性比较；全文无任何功效检测依据。",
+      "overall_reason": "本案例同时命中三类问题：其一，图像层面存在局部磨皮、左右拍摄条件不一致与拼接分隔线（A1、A2）；其二，时间线自相矛盾，4 天新号宣称 28 天实测（A3）；其三，图文与文本内部双重矛盾，产品名、成分、来源前后不一（A4、A5、A6）。三类证据互相独立且可复现，因此判定为高风险，建议下架并转人工审核。"
+    },
+    "suggestions": [
+      "立即下架该笔记并标记「疑似虚假种草」，冻结该账号的带货组件挂载权限",
+      "要求发布者补充 28 天实测的完整原始素材（含拍摄时间戳的原始文件）与产品购买凭证，无法提供则维持下架",
+      "将「4 天内注册的新账号 + 前后对比图」加入风控规则，对同类账号的对比图类内容做强制人工复核"
+    ],
+    "confidence": "高",
+    "escalation_needed": true
+  }
+}

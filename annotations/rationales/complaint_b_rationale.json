@@ -1,0 +1,59 @@
+{
+  "case_id": "complaint_b_recycled",
+  "scene": "售后投诉",
+  "ground_truth": {
+    "label_type": "recycled",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "B1",
+        "type": "image",
+        "anchor": "images/tampered/complaint_b_multiaccount_wall.png",
+        "finding": "4条投诉的缩略图为同一张照片：过敏红肿区域的位置与形状一致、发丝在额前的走向一致、背景浴室瓷砖的缝隙位置一致，4张缩略图两两之间不存在任何构图差异。"
+      },
+      {
+        "id": "B2",
+        "type": "metadata",
+        "anchor": "annotations/timeline_complaint_b.json",
+        "finding": "4条投诉的发布时间为 22:41、22:58、23:12、23:28，全部落在47分钟窗口内，相邻间隔分别为17、14、16分钟；而4个账号注册时间跨度为2026-01-05至2026-01-20。"
+      },
+      {
+        "id": "B3",
+        "type": "text",
+        "anchor": "texts/fake_reviews/complaint_b_four_accounts.txt",
+        "finding": "4条正文逐句重合，差异仅出现在昵称、商品名、时间戳三处；\"用了第三天脸就红肿刺痛\"\"两颊起了一片小疹子\"\"现在已停药\"\"照片是我今天早上洗完脸拍的\"四句在4条中完全一致。"
+      },
+      {
+        "id": "B4",
+        "type": "text",
+        "anchor": "annotations/timeline_complaint_b.json",
+        "finding": "@柠檬tea 在同一天 19:02 刚给「澜本 氨基酸洁面慕斯 150ml」打过五星好评并称\"已经回购第三瓶\"，当晚 23:12 又用同一张照片投诉同一商品（澜本 氨基酸洁面慕斯 150ml）\"用后烂脸\"，两个结论不能同时成立。"
+      },
+      {
+        "id": "B5",
+        "type": "metadata",
+        "anchor": "annotations/timeline_complaint_b.json",
+        "finding": "4条投诉均未提供订单号、购买截图或客服对话记录，佐证材料只有一张被4次重复使用的照片。"
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "低",
+    "exaggerated_claims": [],
+    "fake_endorsements": [],
+    "image_tampering_suspected": false,
+    "text_image_consistency": "一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "投诉照片本身未见AI生成或篡改痕迹：皮肤纹理、绒毛、毛孔分布自然，发丝与背景均无接缝，照片是真实拍摄的。本条的风险不来自图片真伪，而来自4条投诉重复使用同一张照片这一行为。",
+      "exaggeration_reason": "4条正文均未出现绝对化用语、功效宣称或伪造资质背书，因此夸大功效与虚假背书两项为空。",
+      "overall_reason": "判定的核心是素材复用与集中发布：4个账号在47分钟内发布了骨架一致的投诉，配图经比对为同一张照片，且4条均未提供订单号等可核验凭证，@柠檬tea 的历史五星好评与本次投诉自相矛盾。多条\"独立遭遇\"共享同一张照片，说明这些投诉不构成彼此独立的真实消费经历，属于有组织的集中差评，因此判为高风险。",
+      "evidence_recall_note": "应命中 B1–B5 全部5条证据锚点。"
+    },
+    "suggestions": [
+      "对4条投诉做素材同源比对（照片哈希/感知哈希＋正文字符串相似度），命中同源后合并为同一工单处理，不再按4条独立投诉统计。",
+      "暂缓该商品的差评权重计算，向4个账号限时索取订单号与购买凭证，24小时内未提供则标记\"疑似组织化差评\"并剔除其对商品评分的贡献。",
+      "复核@柠檬tea、@小美不熬夜的历史评价记录，对同一账号短周期内既五星好评又投诉同一商品的情况触发账号异常标记，人工审核后再放开其发布权限。"
+    ]
+  }
+}

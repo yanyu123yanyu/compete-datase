@@ -1,0 +1,65 @@
+{
+  "case_id": "repost_c_platform",
+  "image": "images/tampered/repost_c_platform_comparison.png",
+  "image_size": { "width": 1600, "height": 900 },
+  "coord": "normalized",
+  "boxes": [
+    {
+      "box_id": "C1",
+      "bbox": [0.006, 0.15, 0.988, 0.75],
+      "region_type": "full",
+      "evidence": "三块平台上宣称为三次独立拍摄的测评图，画面为同一张素材：瓶身磨砂玻璃的反光走向、泵头与瓶肩的高光位置、背景桌面的木纹走向三者在三个面板中完全一致",
+      "confidence": 0.93
+    },
+    {
+      "box_id": "C1-小红书",
+      "bbox": [0.019, 0.15, 0.312, 0.75],
+      "region_type": "full",
+      "evidence": "小红书面板（@美妆阿May / 2026-03-02 20:15）为首次发布，画面含完整原始水印与拍摄花絮标注",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "C1-抖音",
+      "bbox": [0.344, 0.15, 0.312, 0.75],
+      "region_type": "full",
+      "evidence": "抖音面板（@Mia酱 / 2026-03-09 21:40）画面与小红书面板同源，仅头像与昵称不同，原水印已不可见",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "C1-微博",
+      "bbox": [0.669, 0.15, 0.312, 0.75],
+      "region_type": "full",
+      "evidence": "微博面板（@小鹿护肤 / 2026-03-15 19:05）画面与前两个面板同源，头像更换为猫图，原水印被贴纸遮挡",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "C2",
+      "bbox": [0.206, 0.79, 0.118, 0.075],
+      "region_type": "watermark",
+      "evidence": "小红书面板右下角保留原始水印（@美妆阿May +「拍摄花絮 · 原图直发」），笔画边缘与背景纹理连续，是三个版本里唯一保留原始出处的画面",
+      "confidence": 0.94
+    },
+    {
+      "box_id": "C2-抖音像素带",
+      "bbox": [0.343, 0.221, 0.007, 0.679],
+      "region_type": "tampering",
+      "evidence": "抖音面板左边缘存在一条宽约6px的竖向像素带，像素带两侧的画面亮度与噪点水平不一致，且该位置的桌面木纹纹理被截断，符合裁切掉原水印后重新贴合的特征",
+      "confidence": 0.86
+    },
+    {
+      "box_id": "C2-抖音空水印位",
+      "bbox": [0.541, 0.76, 0.074, 0.071],
+      "region_type": "tampering",
+      "evidence": "抖音面板右下角与小红书面板水印同位置处是空的（原水印被裁掉），图注红框标出该处为空",
+      "confidence": 0.82
+    },
+    {
+      "box_id": "C3",
+      "bbox": [0.815, 0.785, 0.158, 0.18],
+      "region_type": "watermark",
+      "evidence": "微博面板右下角有一块圆角贴纸（写着「整理自网络 · 侵删」），位置与小红书面板原始水印的位置重合，贴纸尺寸大于原水印，贴纸下方不是同一画面内容",
+      "confidence": 0.90
+    }
+  ],
+  "note": "C1/C2/C3 三处证据都锚定在本张对比图的不同元素上，box_id 与 rationale 的 evidence id 一一对应（C1 拆成整图 + 三面板共 4 条）。此外 images/tampered/repost_c_source_watermarked.png 是本图小红书面板的裁切件（500×675），用于单独展示带原始水印的首发版本。"
+}

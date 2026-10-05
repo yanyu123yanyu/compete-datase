@@ -1,0 +1,37 @@
+# ---- Python 编译产物 ----
+__pycache__/
+*.py[cod]
+*.pyo
+*$py.class
+
+# ---- 虚拟环境 ----
+.venv/
+venv/
+env/
+ENV/
+
+# ---- 测试 / 类型检查缓存 ----
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
+
+# ---- 编辑器 / 操作系统 ----
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- 本机运维脚本（含本机绝对路径与用户名，不随数据集分发）----
+tools/sync_and_render.py
+
+# ---- 本地临时与日志 ----
+*.log
+*.tmp
+_remote_check.txt
+scratch/

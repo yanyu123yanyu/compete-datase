@@ -1,0 +1,44 @@
+{
+  "case_id": "repost_c_reworded",
+  "image": "images/tampered/repost_c_reworded_compare.png",
+  "image_size": { "width": 1600, "height": 900 },
+  "coord": "normalized",
+  "note": "box_id 与 annotations/rationales/repost_c_reworded_rationale.json 的 evidence id 一一对应。C1 是三个面板的配图区域（红框内），它们彼此逐像素一致；C3 是三个面板的正文区，用来说明「文字被改写、图没有被改写」。",
+  "boxes": [
+    {
+      "box_id": "C1",
+      "bbox": [0.006, 0.15, 0.988, 0.75],
+      "region_type": "recycled_photo",
+      "evidence": "整图：三个平台的配图与页面版式同源，可直接做逐像素比对",
+      "confidence": 0.92
+    },
+    {
+      "box_id": "C1-小红书配图",
+      "bbox": [0.225, 0.317, 0.125, 0.367],
+      "region_type": "recycled_photo",
+      "evidence": "小红书首发版的商品图区域（红框）：商品本体高光、桌面木纹、噪点分布",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "C1-抖音配图",
+      "bbox": [0.513, 0.317, 0.125, 0.367],
+      "region_type": "recycled_photo",
+      "evidence": "抖音版的商品图区域：与小红书版逐像素一致，但本面板内没有任何水印或拍摄声明文字",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "C1-微博配图",
+      "bbox": [0.838, 0.317, 0.125, 0.367],
+      "region_type": "recycled_photo",
+      "evidence": "微博版的商品图区域：同样与小红书版逐像素一致",
+      "confidence": 0.95
+    },
+    {
+      "box_id": "C3",
+      "bbox": [0.014, 0.60, 0.972, 0.18],
+      "region_type": "text_image",
+      "evidence": "三个面板的正文区：文字被改写（相似度约 0.7），结论与产品定位一致；对比之下，上方的配图区相似度是 1.0",
+      "confidence": 0.90
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "case_id": "complaint_b_fivestar",
+  "image": "images/tampered/complaint_b_fivestar_conflict.png",
+  "image_size": { "width": 1200, "height": 1600 },
+  "coord": "normalized",
+  "note": "box_id 与 annotations/rationales/complaint_b_fivestar_rationale.json 的 evidence id 一一对应。本案没有修图痕迹，也没有重复图片——四条投诉的配图各不相同；可指认的证据是「账号自己的历史评价与本次投诉互斥」，对应 B4 与 B5 两个框。",
+  "boxes": [
+    {
+      "box_id": "B1",
+      "bbox": [0.02, 0.06, 0.96, 0.19],
+      "region_type": "text_image",
+      "evidence": "第 1 条投诉（@小美不熬夜，2026-02-16 21:03）：四条的正文骨架逐字相同（仅昵称、商品与时间戳不同）",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "B2",
+      "bbox": [0.02, 0.27, 0.96, 0.19],
+      "region_type": "text_image",
+      "evidence": "第 2 条投诉（@A护肤日记，2026-02-17 09:47）：正文骨架与第 1 条一致",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "B3-卡片",
+      "bbox": [0.02, 0.48, 0.96, 0.19],
+      "region_type": "text_image",
+      "evidence": "第 3 条投诉（@柠檬tea，2026-02-19 20:31）整卡：正文骨架同上",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "B4",
+      "bbox": [0.75, 0.488, 0.214, 0.032],
+      "region_type": "account_history",
+      "evidence": "第 3 条卡片右上角的「历史评价全五星」标注与发布时间（2026-02-19 20:31）：该账号在投诉前 25 小时刚给同一商品打过五星好评",
+      "confidence": 0.88
+    },
+    {
+      "box_id": "B5",
+      "bbox": [0.275, 0.635, 0.688, 0.028],
+      "region_type": "account_history",
+      "evidence": "第 3 卡与第 4 卡之间的横向对照说明：「同一账号 · 2026-02-18 19:02 五星好评（回购第三瓶）」——把同一账号前后的两个互斥结论并列",
+      "confidence": 0.88
+    },
+    {
+      "box_id": "B6",
+      "bbox": [0.02, 0.69, 0.96, 0.19],
+      "region_type": "text_image",
+      "evidence": "第 4 条投诉（@柒柒子，2026-02-21 22:06）：正文骨架同样一致，证明这是同一批次产出的文案",
+      "confidence": 0.90
+    }
+  ]
+}

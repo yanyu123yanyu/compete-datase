@@ -1,0 +1,60 @@
+{
+  "case_id": "repost_c_platform",
+  "scene": "跨平台搬运",
+  "ground_truth": {
+    "label_type": "reposted",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "C1",
+        "type": "image",
+        "anchor": "images/tampered/repost_c_platform_comparison.png",
+        "finding": "三个平台上宣称为三次独立拍摄的测评图，画面为同一张素材：瓶身磨砂玻璃的反光走向、泵头与瓶肩的高光位置、背景桌面木纹的走向在三块面板中完全一致，三张图之间的差异只出现在水印区域、头像与标签文字。"
+      },
+      {
+        "id": "C2",
+        "type": "image",
+        "anchor": "images/tampered/repost_c_platform_comparison.png#box-C2-抖音像素带",
+        "finding": "小红书面板右下角保留原始水印（@美妆阿May +「拍摄花絮 · 原图直发」，归一化区域约 [0.206,0.79,0.118,0.075]）；抖音面板在该位置没有任何水印或说明文字（对照图同位置有），且在面板左边缘（像素 x≈550–560）残留一条宽约 6px 的像素带，该处桌面木纹被截断、左右两侧亮度不一致。"
+      },
+      {
+        "id": "C3",
+        "type": "image",
+        "anchor": "images/tampered/repost_c_platform_comparison.png#box-C3",
+        "finding": "微博面板右下角用一块圆角贴纸（归一化区域约 [0.815,0.785,0.158,0.18]）遮盖原水印位置，贴纸上写着「整理自网络 · 侵删」，与首发版本同位置的水印不是同一内容。"
+      },
+      {
+        "id": "C4",
+        "type": "text",
+        "anchor": "texts/fake_reviews/repost_c_same_copy.txt",
+        "finding": "三个版本的正文逐字相同（从\"妆效是半哑光的柔雾质感\"到\"学生党和新手不用花大价钱试错\"，编辑距离为0），差异仅出现在结尾话题标签；首发版本没有任何\"同步发布\"或\"全网同名\"的说明。"
+      },
+      {
+        "id": "C5",
+        "type": "metadata",
+        "anchor": "annotations/provenance_repost_c.json",
+        "finding": "三个平台的发布时间依次为 2026-03-02 20:15、2026-03-09 21:40、2026-03-15 19:05，呈严格单向递增（间隔7天与6天）；只有小红书版本保留原始EXIF与拍摄花絮，抖音、微博版本EXIF缺失，账号 @Mia酱 与 @小鹿护肤 的注册时间均晚于首次发布时间。"
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "低",
+    "exaggerated_claims": [],
+    "fake_endorsements": [],
+    "image_tampering_suspected": true,
+    "text_image_consistency": "一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "图片画面为真实拍摄，未见AI生成痕迹（磨砂瓶身的反光过渡、桌面木纹的噪点分布均自然）。可疑点在后期处理：抖音版本有裁切水印留下的像素带，微博版本有水印被贴纸覆盖的区域，属于对图片的二次加工而非生成。",
+      "exaggeration_reason": "三个版本正文相同且未出现绝对化用语或功效违规宣称，因此夸大功效与虚假背书两项为空。",
+      "overall_reason": "判定的核心是素材复用＋身份替换：同一张测评图在三个平台依次出现且正文逐字相同，后两个版本分别用裁切与贴纸遮盖首发者的水印，并把头像换成与首发账号无关的账号，对外呈现为三位不同博主的独立原创测评；同时后两个账号的注册时间晚于首发时间，只有首发版本保留原始EXIF与拍摄花絮，来源链单向指向 @美妆阿May。因此判为搬运冒充原创，风险等级为高风险。",
+      "control_comparison": "对照 repost_c_control：真实跨平台同步应表现为同一作者同名同头像、主动注明首发平台、文案存在平台化改写（长度与话题标签不同），本案例三项均不满足。",
+      "evidence_recall_note": "应命中 C1–C5 全部5条证据锚点。"
+    },
+    "suggestions": [
+      "在抖音与微博两个版本上追加\"内容来源：小红书 @美妆阿May（2026-03-02 首发）\"的来源标注，恢复原始水印区域，暂缓对这两个账号的原创标识与流量扶持。",
+      "把三份文本与三张图片录入搬运指纹库（正文文本哈希＋图片感知哈希），对\"同素材＋不同账号＋发布时间单向递增\"的组合自动触发搬运告警，避免同一素材继续跨平台扩散。",
+      "向 @Mia酱、@小鹿护肤 索取原始拍摄文件（含EXIF）与拍摄花絮，限时未提供则按平台规则判为搬运，通知 @美妆阿May 可发起原创投诉并复核其被投诉笔记的流量补偿。"
+    ]
+  }
+}

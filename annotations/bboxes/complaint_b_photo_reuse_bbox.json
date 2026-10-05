@@ -1,0 +1,65 @@
+{
+  "case_id": "complaint_b_photo_reuse",
+  "image": "images/tampered/complaint_b_photo_reuse.png",
+  "image_size": { "width": 1200, "height": 1600 },
+  "coord": "normalized",
+  "note": "box_id 与 annotations/rationales/complaint_b_photo_reuse_rationale.json 的 evidence id 一一对应。本案与 complaint_b_recycled 的区别：发布时间被打散到 5 天（不再是 47 分钟内集中发布），所以「集中发布」这条证据不成立；可指认的证据落在「四条配图是同一个文件」和「该文件的拍摄日期晚于前两条的发布时间」上。",
+  "boxes": [
+    {
+      "box_id": "B1-1",
+      "bbox": [0.02, 0.06, 0.96, 0.19],
+      "region_type": "recycled_photo",
+      "evidence": "第 1 条投诉（@小美不熬夜，2026-02-16 21:03）：整卡区域，左侧缩略图与另外三条像素完全一致，卡内红字注明「4 条的配图都是这同一个文件」",
+      "confidence": 0.94
+    },
+    {
+      "box_id": "B1-2",
+      "bbox": [0.02, 0.27, 0.96, 0.19],
+      "region_type": "recycled_photo",
+      "evidence": "第 2 条投诉（@A护肤日记，2026-02-17 09:47）：缩略图与第 1 条逐像素一致",
+      "confidence": 0.94
+    },
+    {
+      "box_id": "B1-3",
+      "bbox": [0.02, 0.48, 0.96, 0.19],
+      "region_type": "recycled_photo",
+      "evidence": "第 3 条投诉（@柠檬tea，2026-02-19 20:31）：缩略图与第 1 条逐像素一致，且该账号右侧标有「历史评价全五星」",
+      "confidence": 0.94
+    },
+    {
+      "box_id": "B1-4",
+      "bbox": [0.02, 0.69, 0.96, 0.19],
+      "region_type": "recycled_photo",
+      "evidence": "第 4 条投诉（@柒柒子，2026-02-21 22:06）：缩略图与第 1 条逐像素一致",
+      "confidence": 0.94
+    },
+    {
+      "box_id": "B2",
+      "bbox": [0.0, 0.044, 1.0, 0.144],
+      "region_type": "tampering",
+      "evidence": "页面顶部固定说明：指出四条配图是同一个文件、该文件拍摄于 2026-02-18；这一条横幅本身就是本案的结论，对应 rationale 的 B3",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "B3",
+      "bbox": [0.033, 0.0575, 0.3167, 0.125],
+      "region_type": "image",
+      "evidence": "顶部展示的共用照片本身（拍摄于 2026-02-18 的原帖日期）",
+      "confidence": 0.92
+    },
+    {
+      "box_id": "B4",
+      "bbox": [0.033, 0.2206, 0.222, 0.0144],
+      "region_type": "label",
+      "evidence": "第 1 条卡片内的配图文件名与拍摄日期：IMG_2026-02-18_2241.jpg（拍摄于 02-18）——晚于本条发布时间 2026-02-16 21:03",
+      "confidence": 0.90
+    },
+    {
+      "box_id": "B5",
+      "bbox": [0.0, 0.0, 1.0, 1.0],
+      "region_type": "text_image",
+      "evidence": "整图：4 个账号、5 个日期、1 张照片——把「时间分散」当成伪装，但配图复用这一条硬证据没被改掉",
+      "confidence": 0.86
+    }
+  ]
+}

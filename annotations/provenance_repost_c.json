@@ -1,0 +1,60 @@
+{
+  "case_id": "repost_c_platform",
+  "image": "images/tampered/repost_c_platform_comparison.png",
+  "source_photo": "images/tampered/repost_c_source_watermarked.png",
+  "text": "texts/fake_reviews/repost_c_same_copy.txt",
+  "phash_identical": true,
+  "phash_note": "三个平台的测评图为同一素材，画面骨架一致；差异仅存在于水印区域与头像区域，因此在水印区被裁切或遮盖前后，整图感知哈希保持一致，像素级差异集中在 C2、C3 两处。",
+  "copy_edit_distance": 0,
+  "timeline_order": ["小红书", "抖音", "微博"],
+  "platforms": [
+    {
+      "platform": "小红书",
+      "account": "@美妆阿May",
+      "published_at": "2026-03-02 20:15",
+      "account_created_at": "2025-06-11",
+      "is_first_release": true,
+      "has_original_exif": true,
+      "exif_captured_at": "2026-03-02 18:52",
+      "device": "iPhone 15 Pro（EXIF 完整，含 GPS 与拍摄时间）",
+      "has_behind_the_scenes": true,
+      "watermark_handling": "原始水印完整保留（右下角 @美妆阿May，与画面同步生成）",
+      "avatar": "本人头像（与账号绑定的同一张照片）",
+      "profile_note": "主页简介含拍摄设备与拍摄场地说明",
+      "hashtags": "#底妆 #粉底液 #测评 #干皮 #油皮"
+    },
+    {
+      "platform": "抖音",
+      "account": "@Mia酱",
+      "published_at": "2026-03-09 21:40",
+      "account_created_at": "2026-02-25",
+      "is_first_release": false,
+      "has_original_exif": false,
+      "exif_captured_at": null,
+      "device": "EXIF 缺失（上传前已被剥离）",
+      "has_behind_the_scenes": false,
+      "watermark_handling": "原水印被裁切：面板左边缘残留宽约6px的像素带，两侧亮度与噪点水平不一致，桌面木纹被截断；与首发版本同位置（右下角）处已无任何水印",
+      "avatar": "与 @美妆阿May 无关的第三方头像",
+      "profile_note": "无首发或同步发布说明",
+      "hashtags": "#底妆分享 #粉底液 #好用 #测评",
+      "note": "账号注册于首发前5天，发布晚于首发7天"
+    },
+    {
+      "platform": "微博",
+      "account": "@小鹿护肤",
+      "published_at": "2026-03-15 19:05",
+      "account_created_at": "2026-03-08",
+      "is_first_release": false,
+      "has_original_exif": false,
+      "exif_captured_at": null,
+      "device": "EXIF 缺失（上传前已被剥离）",
+      "has_behind_the_scenes": false,
+      "watermark_handling": "原水印被圆角贴纸遮挡，贴纸尺寸略大于原水印，覆盖位置与需遮盖的水印位置重合",
+      "avatar": "猫图（非本人头像）",
+      "profile_note": "无首发或同步发布说明",
+      "hashtags": "#底妆 #护肤 #测评 #种草",
+      "note": "账号注册于首发后6天，发布晚于首发13天"
+    }
+  ],
+  "summary": "同一测评图与逐字相同的正文在3个平台依次出现（03-02 → 03-09 → 03-15），首发版本保留原始水印、原始EXIF与拍摄花絮；后两个版本分别以裁切与贴纸方式去除水印并更换头像，账号注册时间均临近各自发布日，来源链单向指向小红书 @美妆阿May。"
+}

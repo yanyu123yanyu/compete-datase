@@ -1,0 +1,54 @@
+{
+  "case_id": "complaint_b_fivestar",
+  "scene": "售后投诉",
+  "ground_truth": {
+    "label_type": "recycled",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "B1",
+        "type": "text",
+        "anchor": "texts/fake_reviews/complaint_b_fivestar.txt",
+        "finding": "四条投诉的正文骨架逐字相同（\"我用了第三天脸就红肿刺痛，已经停药了\"\"有没有姐妹跟我一样？我们一起维权\"），差异仅出现在昵称、商品名与时间戳；四条发布时间为 2026-02-16 21:03、02-17 09:47、02-19 20:31、02-21 22:06，分散在5天内。"
+      },
+      {
+        "id": "B2",
+        "type": "image",
+        "anchor": "annotations/bboxes/complaint_b_fivestar_bbox.json#box-B4",
+        "finding": "第3条投诉卡片右上角标注\"历史评价全五星\"，发布时间为 2026-02-19 20:31：该账号在 2026-02-18 19:02 刚给「澜本 氨基酸洁面慕斯 150ml」打过五星好评并称\"已经回购第三瓶\"，两个结论相隔25小时、不能同时成立。"
+      },
+      {
+        "id": "B3",
+        "type": "image",
+        "anchor": "annotations/bboxes/complaint_b_fivestar_bbox.json#box-B5",
+        "finding": "第3卡与第4卡之间的横向对照说明把同一账号的前后两次表态并列（\"同一账号 · 2026-02-18 19:02 五星好评（回购第三瓶）\"），可直接与 02-19 20:31 的投诉结论对照。"
+      },
+      {
+        "id": "B4",
+        "type": "metadata",
+        "anchor": "annotations/timeline_complaint_b_fivestar.json",
+        "finding": "四条投诉的配图各不相同（因此本案例刻意绕开了基于图片哈希的检测），但四条均未提供订单号、购买截图或客服对话记录，可核验凭证为零；四条正文骨架一致，说明是同一批次产出的文案。"
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "低",
+    "exaggerated_claims": [],
+    "fake_endorsements": [],
+    "image_tampering_suspected": false,
+    "text_image_consistency": "一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "四张投诉照片均未见AI生成或篡改痕迹，图片与文字描述的症状基本对应，因此在\"图片真伪\"这一维度上全部通过——本案例特意证明了图片检测无法覆盖这类造假。",
+      "exaggeration_reason": "四条正文均未出现绝对化用语或功效宣称，因此夸大功效与虚假背书两项为空。",
+      "overall_reason": "判定的核心是账号行为自相矛盾：四条投诉的配图各不相同、发布时间分散在5天，基于图片哈希与时间聚集的检测都会漏掉；但 @柠檬tea 在同一商品上先给出\"回购第三瓶\"的五星好评、25小时后又投诉\"用后烂脸\"，同一账号的两次表态互斥，且四条投诉都拿不出订单号。这类差评的目的不是陈述体验，而是压低竞品评分，因此判为高风险。",
+      "control_comparison": "对照 complaint_b_control：真实投诉会提供订单号与客服处理时间线，且作者明确区分\"产品本身没问题\"与\"我个人对香精敏感\"，不会在同一商品上留下互斥评价。",
+      "evidence_recall_note": "应命中 B1–B4 全部4条证据锚点。"
+    },
+    "suggestions": [
+      "对发布差评的账号做历史评价回溯，发现\"同一商品短周期内既五星好评又投诉\"的组合时触发账号异常标记，人工复核后再决定是否计入商品评分。",
+      "四条评论正文骨架一致但配图不同，应按文本骨架做聚类（而非只比图片），命中同批次文案后合并为同一工单。",
+      "向四个账号限时索取订单号；同时核对 @柠檬tea 的五星好评是否来自同一订单，若同一订单先好评后退款，应按\"评价操纵\"处理该账号。"
+    ]
+  }
+}

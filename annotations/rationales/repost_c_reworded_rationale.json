@@ -1,0 +1,54 @@
+{
+  "case_id": "repost_c_reworded",
+  "scene": "跨平台搬运",
+  "ground_truth": {
+    "label_type": "reposted",
+    "risk_level": "高风险",
+    "evidence": [
+      {
+        "id": "C1",
+        "type": "image",
+        "anchor": "images/tampered/repost_c_reworded_compare.png#box-C1-抖音配图",
+        "finding": "三个平台红框标出的商品图区域彼此逐像素一致：磨砂瓶身的反光走向、瓶肩高光位置、背景桌面木纹的走向与噪点分布完全相同，说明三个版本用的是同一张图。"
+      },
+      {
+        "id": "C2",
+        "type": "text",
+        "anchor": "texts/fake_reviews/repost_c_reworded.txt",
+        "finding": "三个平台的正文被改写：\"妆效\"改成\"妆感\"、语序重排、话题标签各换一套，文字相似度约 0.70/0.68；但结论、产品定位与使用时长完全一致，图片相似度是 1.0。"
+      },
+      {
+        "id": "C3",
+        "type": "image",
+        "anchor": "images/tampered/repost_c_reworded_compare.png#box-C3",
+        "finding": "三个面板的配图区域都没有水印——本案例的水印处理比第一个实例干净（没有裁切像素带、没有遮挡贴纸），所以\"找修图痕迹\"的思路会失效，必须做跨平台图片同源比对。"
+      },
+      {
+        "id": "C4",
+        "type": "metadata",
+        "anchor": "annotations/provenance_repost_c_reworded.json",
+        "finding": "三个平台发布时间依次为 2026-03-02 20:15（小红书 @美妆阿May）、2026-03-09 21:40（抖音 @Mia酱）、2026-03-15 19:05（微博 @小鹿护肤），单向递增、间隔7天与6天；三个账号彼此无关，抖音与微博账号的注册时间晚于首发时间。"
+      }
+    ]
+  },
+  "expected_agent_output": {
+    "ai_generated_probability": "低",
+    "exaggerated_claims": [],
+    "fake_endorsements": [],
+    "image_tampering_suspected": false,
+    "text_image_consistency": "一致",
+    "risk_level": "高风险",
+    "reasoning": {
+      "ai_detection_reason": "图片画面为真实拍摄，未见AI生成痕迹，也没有裁切或遮挡水印留下的像素痕迹——本案例的后期处理阶段几乎是干净的。",
+      "exaggeration_reason": "三个版本均未出现绝对化用语、功效宣称或伪造背书，因此夸大功效与虚假背书两项为空。",
+      "overall_reason": "判定的核心是\"文案改了、图没改\"：三个平台的正文相似度只有约 0.7，如果只做文本查重很容易判成不同内容；但配图区域逐像素一致，加上发布时间单向递增、账号互不相关，说明同一张测评图被三个账号依次投放，只换了文字外壳。改文案能躲过文本查重，躲不过底图比对，因此判为搬运冒充原创，风险等级为高风险。",
+      "control_comparison": "对照 repost_c_control：真实跨平台同步由同一作者发布（同名同头像、简介写\"全网同名\"），主动注明首发平台，且正文按平台习惯改写的同时配图会重新裁切；本案例恰好相反——账号不同，但配图没有重新裁切。",
+      "evidence_recall_note": "应命中 C1–C4 全部4条证据锚点。"
+    },
+    "suggestions": [
+      "对抖音与微博版本追加来源标注（\"内容来源：小红书 @美妆阿May，2026-03-02 首发\"），并在两个账号的原创标识审核完成前暂停流量扶持。",
+      "搬运指纹库把\"文本相似度低 + 图片相似度极高\"的组合单独设一条规则：文本被改写不降低搬运告警等级，只要底图同源就触发告警。",
+      "向 @Mia酱、@小鹿护肤 索取原始拍摄文件与拍摄花絮；限时未提供则按平台规则判为搬运，通知 @美妆阿May 发起原创投诉并复核其笔记的流量补偿。"
+    ]
+  }
+}
