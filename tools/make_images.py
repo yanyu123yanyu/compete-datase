@@ -21,6 +21,150 @@ try:  # Windows 控制台默认可能是 GBK，打印中文会炸，这里统一
 except Exception:
     pass
 
+# ---------------------------------------------------------------- 真实照片纹理引擎
+# 用磁盘上的真实照片替换程序生成的材质，让图片更具真实感。
+# 纹理来源（按优先级）：
+#   textures/product/ —— 从小红书等渠道下载的真实产品照片
+#   textures/skin/    —— 真实皮肤纹理照片
+#   TIGAS_data/real/  —— 真人面部照片（由 --tigas 传入路径）
+#   素材/图片/         —— 用户提供的参考图片
+# 找不到纹理时自动回退到程序生成，保证代码始终可运行。
+
+_TEXTURE_CACHE: dict[str, Image.Image] = {}
+
+# 全局 TIGAS 路径，由 main() 设置，所有 make_* 与纹理加载函数共享
+TIGAS_ROOT: str | None = None
+
+def _find_texture(candidates: list[str], size: tuple[int,int] | None = None,
+                  crop_center: bool = True) -> Image.Image | None:
+    """从文件列表中加载第一张存在的图片，缓存并缩放到 size。
+    
+    candidates: 候选绝对路径列表，按优先级排列。
+    size:       目标尺寸 (w, h)，None 表示原尺寸。
+    crop_center: True 时居中裁剪以匹配宽高比，否则拉伸。
+    
+    返回 Image 或 None（所有候选路径都不存在时）。
+    """
+    for path in candidates:
+        norm = os.path.normpath(path)
+        if norm in _TEXTURE_CACHE:
+            im = _TEXTURE_CACHE[norm]
+            break
+        if os.path.isfile(norm):
+            try:
+                im = Image.open(norm).convert("RGB")
+                _TEXTURE_CACHE[norm] = im
+                break
+            except Exception:
+                continue
+    else:
+        return None
+    if size is None:
+        return im.copy()
+    tw, th = size
+    if crop_center:
+        iw, ih = im.size
+        scale = max(tw / iw, th / ih)
+        nw, nh = int(iw * scale), int(ih * scale)
+        im2 = im.resize((nw, nh), Image.LANCZOS)
+        left = (nw - tw) // 2
+        top = (nh - th) // 2
+        return im2.crop((left, top, left + tw, top + th))
+    else:
+        return im.resize(size, Image.LANCZOS)
+
+def load_real_face(tigas_root: str | None = None, size: tuple[int,int] | None = None,
+                   face_id: str = "00002") -> Image.Image | None:
+    """加载一张真实人脸照片，缩放到指定尺寸。
+    
+    搜索顺序：textures/skin/ → TIGAS_data/real/ → 素材/图片/
+    tigas_root 为 None 时使用全局 TIGAS_ROOT。全部不可用时返回 None（走程序生成兜底）。
+    size 为 None 时返回原图尺寸。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    candidates = []
+    # 1) textures/skin/ —— 下载的高清皮肤/人脸特写
+    skin_dir = os.path.join(project_root, "textures", "skin")
+    if os.path.isdir(skin_dir):
+        for f in sorted(os.listdir(skin_dir)):
+            if f.lower().endswith((".jpg", ".jpeg", ".png")):
+                candidates.append(os.path.join(skin_dir, f))
+    # 2) TIGAS_data/real/
+    root = tigas_root or TIGAS_ROOT
+    if root:
+        base = os.path.join(root, "real")
+        for suffix in (".jpeg", ".jpg", ".png"):
+            candidates.append(os.path.join(base, f"{face_id}{suffix}"))
+    # 3) 素材/图片/
+    mtl_base = r"D:\欧莱雅黑客松\素材\图片"
+    for fname in ("real_001.jpg", "fake_001.jpg"):
+        candidates.append(os.path.join(mtl_base, fname))
+    return _find_texture(candidates, size, crop_center=True)
+
+def load_real_product(tigas_root: str | None = None, size: tuple[int,int] | None = None,
+                      variant: str = "default") -> Image.Image | None:
+    """加载一张真实产品/商品照片，缩放到指定尺寸并做 photo_finish 处理。
+    
+    搜索顺序：textures/product/ → 素材/图片/ → TIGAS_data/real/
+    tigas_root 为 None 时使用全局 TIGAS_ROOT。"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    candidates = []
+    # 1) textures/product/ —— 从小红书/Unsplash 下载的真实产品图
+    product_dir = os.path.join(project_root, "textures", "product")
+    if os.path.isdir(product_dir):
+        for f in sorted(os.listdir(product_dir)):
+            if f.lower().endswith((".jpg", ".jpeg", ".png")):
+                candidates.append(os.path.join(product_dir, f))
+    # 2) 素材/图片/
+    mtl_base = r"D:\欧莱雅黑客松\素材\图片"
+    for fname in ("fake_001.jpg", "real_001.jpg"):
+        candidates.append(os.path.join(mtl_base, fname))
+    # 3) TIGAS_data/real/（兜底，但 TIGAS 主要是人脸，优先级最低）
+    root = tigas_root or TIGAS_ROOT
+    if root:
+        base = os.path.join(root, "real")
+        for fname in ("00002.jpeg", "00003.jpeg", "00004.jpeg"):
+            candidates.append(os.path.join(base, fname))
+    im = _find_texture(candidates, size, crop_center=True)
+    if im is not None:
+        im = photo_finish(im, warmth=1.02, grain=5, vignette=0.12, seed=hash(variant) % 1000)
+    return im
+
+def load_real_skin_texture(size: tuple[int,int] | None = None, seed: int = 42,
+                           tigas_root: str | None = None) -> Image.Image:
+    """加载真实皮肤纹理照片。优先 textures/skin/，其次 TIGAS 面部图 / 素材，最后程序生成兜底。
+    
+    tigas_root 为 None 时使用全局 TIGAS_ROOT。size 为 None 时用 256×256 兜底。
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    sz = size or (256, 256)
+    candidates = []
+    # 1) textures/skin/ —— 下载的皮肤/面部特写照片
+    skin_dir = os.path.join(project_root, "textures", "skin")
+    if os.path.isdir(skin_dir):
+        for f in sorted(os.listdir(skin_dir)):
+            if f.lower().endswith((".jpg", ".jpeg", ".png")):
+                candidates.append(os.path.join(skin_dir, f))
+    # 2) TIGAS_data/real/
+    root = tigas_root or TIGAS_ROOT
+    if root:
+        base = os.path.join(root, "real")
+        for i in range(2, 20):
+            candidates.append(os.path.join(base, f"{i:05d}.jpeg"))
+    # 3) 素材/图片/
+    mtl_base = r"D:\欧莱雅黑客松\素材\图片"
+    for fname in ("real_001.jpg", "fake_001.jpg"):
+        candidates.append(os.path.join(mtl_base, fname))
+    im = _find_texture(candidates, sz, crop_center=True)
+    if im is not None:
+        im = photo_finish(im, warmth=1.01, grain=4, vignette=0.08, seed=seed)
+        return im
+    # 4) 程序生成兜底
+    return skin_patch((0, 0, sz[0], sz[1]), seed=seed)
+
 # ---------------------------------------------------------------- 基础工具
 
 FONT_CANDIDATES = [
@@ -90,6 +234,12 @@ def paste_rr(base: Image.Image, box, r: int, fill_img: Image.Image):
     mask = Image.new("L", (w, h), 0)
     ImageDraw.Draw(mask).rounded_rectangle([0, 0, w - 1, h - 1], radius=r, fill=255)
     base.paste(fill_img.resize((w, h), Image.BILINEAR), (x0, y0), mask)
+
+def _round_corner_mask(w: int, h: int, r: int) -> Image.Image:
+    """创建一张圆角矩形灰度蒙版，供 paste 使用。"""
+    mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w - 1, h - 1], radius=r, fill=255)
+    return mask
 
 def _measure(f, text: str) -> float:
     try:
@@ -309,7 +459,7 @@ def product_bottle(base, cx, base_y, bw, bh, cap_col, body_col, label=("控油�
 
 def photo_product(w, h, cap_col=(43, 47, 54), body_col=(240, 232, 236),
                   label=("柔雾", "粉底液"), seed=71, object_scale=0.62):
-    """一张「实拍商品图」：木纹台面 + 柔光 + 材质渲染的瓶子 + 摄影收尾。
+    """一张「实拍商品图」：木纹台面 + 柔光 + 真实产品照片 + 摄影收尾。
 
     完全确定性（固定种子 + 纯几何），所以同一参数两次调用 → 像素完全一致，
     「多个平台逐像素复用同一张底图」这条证据仍然成立。
@@ -325,9 +475,20 @@ def photo_product(w, h, cap_col=(43, 47, 54), body_col=(240, 232, 236),
         sd.line([(xx, yy), (xx + 14 + rp.random() * 30, yy)], fill=(146, 118, 92))
     soft_ellipse(shot, [w * 0.08, h * 0.02, w * 0.92, h * 0.62], (250, 242, 226), blur=40, alpha=170)
     shot = photo_finish(shot, warmth=1.04, grain=6, vignette=0.18, seed=seed)
+
+    # 用真实产品照片替换程序生成的瓶身渲染
     bw = int(min(w, h) * object_scale)
     bh = int(bw * 1.55)
-    product_bottle(shot, int(w / 2), int(h * 0.90), bw, bh, cap_col, body_col, label=label)
+    real_prod = load_real_product(size=(bw, bh), variant=label[0])
+    if real_prod is not None:
+        # 将真实产品图合成到台面上
+        px = int(w / 2 - bw / 2)
+        py = int(h * 0.90 - bh)
+        shadow(shot, (px + bw * 0.06, py + bh - 10, px + bw * 0.94, py + bh + 16), blur=14, alpha=95)
+        shot.paste(real_prod, (px, py), _round_corner_mask(bw, bh, max(4, int(bw * 0.14))))
+    else:
+        # 兜底：程序生成瓶身
+        product_bottle(shot, int(w / 2), int(h * 0.90), bw, bh, cap_col, body_col, label=label)
     return shot
 
 # ---------------------------------------------------------------- ① 前后对比图 1200x800
@@ -335,47 +496,77 @@ def photo_product(w, h, cap_col=(43, 47, 54), body_col=(240, 232, 236),
 def make_beforeafter(out_path: str):
     W, H = 1200, 800
     SEAM_X, X_L, W_L, X_R, W_R = 596, 0, 588, 612, 588
-    random.seed(31)  # 毛孔点位置必须可复现：证据 A1 靠的就是这一层纹理
+    random.seed(31)
     img = Image.new("RGB", (W, H), "#c9cfd4")
     d = ImageDraw.Draw(img)
-    # 左：灰蓝阴天侧逆光；右：正面平光暖白
     img.paste(vgrad((W_L, H), (238, 242, 245), (142, 151, 161)), (X_L, 0))
     d.polygon([(0, 640), (300, 470), (588, 610), (588, 800), (0, 800)], fill=(154, 163, 172))
     img.paste(vgrad((W_R, H), (255, 253, 251), (230, 222, 214)), (X_R, 0))
 
-    def face(cx, cy, rw, rh, light, tone, blur, pores):
-        # 用径向近似：多层同心椭圆模拟光比
-        layer = Image.new("RGB", (rw * 2, rh * 2), tone)
-        ld = ImageDraw.Draw(layer)
-        for i in range(28, 0, -1):
-            t = i / 28
-            col = tuple(int(light[k] * (1 - t) + tone[k] * t) for k in range(3))
-            ld.ellipse([rw - rw * t, rh - rh * t, rw + rw * t, rh + rh * t], fill=col)
-        if blur:
-            layer = layer.filter(ImageFilter.GaussianBlur(2.4))
-        img.paste(layer, (int(cx - rw), int(cy - rh)))
-        # 五官
-        d.ellipse([cx - rw * 0.52, cy - rh * 0.20, cx - rw * 0.24, cy - rh * 0.08], fill=(70, 40, 32))
-        d.ellipse([cx + rw * 0.24, cy - rh * 0.20, cx + rw * 0.52, cy - rh * 0.08], fill=(70, 40, 32))
-        d.ellipse([cx - rw * 0.28, cy + rh * 0.44, cx + rw * 0.28, cy + rh * 0.60], fill=(150, 60, 50))
-        d.arc([cx - rw * 0.62, cy - rh * 0.42, cx - rw * 0.18, cy - rh * 0.24], 200, 340, fill=(70, 40, 32), width=3)
-        d.arc([cx + rw * 0.18, cy - rh * 0.42, cx + rw * 0.62, cy - rh * 0.24], 200, 340, fill=(70, 40, 32), width=3)
-        if pores:
-            for _ in range(700):
-                ang = random.random() * 6.2832
-                rad = random.random() ** 0.5
-                px = cx + rw * 0.88 * rad * math.cos(ang)
-                py = cy + rh * 0.88 * rad * math.sin(ang)
-                r2 = 0.5 + random.random() * 0.9
-                d.ellipse([px - r2, py - r2, px + r2, py + r2], fill=(122, 82, 72))
+    def face_real(cx, cy, rw, rh, face_id, warm_bias=1.0):
+        """用真实照片叠入指定位置。左冷光 / 右暖光通过 warm_bias 控制。"""
+        fw, fh = rw * 2, rh * 2
+        real = load_real_face(TIGAS_ROOT, (fw, fh), face_id=face_id)
+        if real is not None:
+            r0, g0, b0 = real.split()
+            warm = warm_bias
+            r = r0.point(lambda v: min(255, int(v * warm)))
+            b = b0.point(lambda v: max(0, int(v * (2.0 - warm))))
+            real = Image.merge("RGB", (r, g0, b))
+            real = real.filter(ImageFilter.GaussianBlur(0.6))
+            img.paste(real, (int(cx - rw), int(cy - rh)))
+            return True
+        return False
 
-    face(300, 330, 196, 250, (246, 217, 196), (201, 138, 108), False, True)
-    # 左脸腮红（区域落在 A1 证据框外，避免盖住毛孔证据）
+    used_real_left = face_real(300, 330, 196, 250, "00002", warm_bias=0.94)
+    used_real_right = face_real(912, 330, 196, 250, "00002", warm_bias=1.06)
+    if not used_real_left:
+        def face_fallback(cx, cy, rw, rh, light, tone, blur, pores):
+            layer = Image.new("RGB", (rw * 2, rh * 2), tone)
+            ld = ImageDraw.Draw(layer)
+            for i in range(28, 0, -1):
+                t = i / 28
+                col = tuple(int(light[k] * (1 - t) + tone[k] * t) for k in range(3))
+                ld.ellipse([rw - rw * t, rh - rh * t, rw + rw * t, rh + rh * t], fill=col)
+            if blur:
+                layer = layer.filter(ImageFilter.GaussianBlur(2.4))
+            img.paste(layer, (int(cx - rw), int(cy - rh)))
+            d.ellipse([cx - rw * 0.52, cy - rh * 0.20, cx - rw * 0.24, cy - rh * 0.08], fill=(70, 40, 32))
+            d.ellipse([cx + rw * 0.24, cy - rh * 0.20, cx + rw * 0.52, cy - rh * 0.08], fill=(70, 40, 32))
+            d.ellipse([cx - rw * 0.28, cy + rh * 0.44, cx + rw * 0.28, cy + rh * 0.60], fill=(150, 60, 50))
+            d.arc([cx - rw * 0.62, cy - rh * 0.42, cx - rw * 0.18, cy - rh * 0.24], 200, 340, fill=(70, 40, 32), width=3)
+            d.arc([cx + rw * 0.18, cy - rh * 0.42, cx + rw * 0.62, cy - rh * 0.24], 200, 340, fill=(70, 40, 32), width=3)
+            if pores:
+                for _ in range(700):
+                    ang = random.random() * 6.2832
+                    rad = random.random() ** 0.5
+                    px = cx + rw * 0.88 * rad * math.cos(ang)
+                    py = cy + rh * 0.88 * rad * math.sin(ang)
+                    r2 = 0.5 + random.random() * 0.9
+                    d.ellipse([px - r2, py - r2, px + r2, py + r2], fill=(122, 82, 72))
+        face_fallback(300, 330, 196, 250, (246, 217, 196), (201, 138, 108), False, True)
+
     soft_ellipse(img, [140, 392, 296, 492], (232, 150, 146), blur=16, alpha=120)
-    face(912, 330, 196, 250, (255, 242, 230), (214, 161, 132), True, False)
-    # 右脸整体提亮
-    ov = Image.new("RGB", (W_R, H), (255, 245, 234))
-    img.paste(Image.blend(img.crop((X_R, 0, X_R + W_R, H)), ov, 0.30), (X_R, 0))
+
+    if not used_real_right:
+        def face_fallback2(cx, cy, rw, rh, light, tone, blur, pores):
+            layer = Image.new("RGB", (rw * 2, rh * 2), tone)
+            ld = ImageDraw.Draw(layer)
+            for i in range(28, 0, -1):
+                t = i / 28
+                col = tuple(int(light[k] * (1 - t) + tone[k] * t) for k in range(3))
+                ld.ellipse([rw - rw * t, rh - rh * t, rw + rw * t, rh + rh * t], fill=col)
+            if blur:
+                layer = layer.filter(ImageFilter.GaussianBlur(2.4))
+            img.paste(layer, (int(cx - rw), int(cy - rh)))
+            d.ellipse([cx - rw * 0.52, cy - rh * 0.20, cx - rw * 0.24, cy - rh * 0.08], fill=(70, 40, 32))
+            d.ellipse([cx + rw * 0.24, cy - rh * 0.20, cx + rw * 0.52, cy - rh * 0.08], fill=(70, 40, 32))
+            d.ellipse([cx - rw * 0.28, cy + rh * 0.44, cx + rw * 0.28, cy + rh * 0.60], fill=(150, 60, 50))
+            d.arc([cx - rw * 0.62, cy - rh * 0.42, cx - rw * 0.18, cy - rh * 0.24], 200, 340, fill=(70, 40, 32), width=3)
+            d.arc([cx + rw * 0.18, cy - rh * 0.42, cx + rw * 0.62, cy - rh * 0.24], 200, 340, fill=(70, 40, 32), width=3)
+        face_fallback2(912, 330, 196, 250, (255, 242, 230), (214, 161, 132), True, False)
+        ov = Image.new("RGB", (W_R, H), (255, 245, 234))
+        img.paste(Image.blend(img.crop((X_R, 0, X_R + W_R, H)), ov, 0.30), (X_R, 0))
 
     # 摄影收尾：先在「照片层」上做降采样/调色/噪点/暗角，再画 UI（这样字还是锐的）
     img = photo_finish(img, warmth=1.02, grain=6, vignette=0.14, seed=31)
@@ -517,19 +708,8 @@ def _shared_photo(img, box, seed=4242, zoom=1.0, jitter=False):
     else:
         paste_box = (x, y, w, h)
     px, py, pw, ph = paste_box
-    # 照片本体：真实的皮肤特写（毛孔 + 细纹 + 不均匀泛红 + 油光），固定种子可复现
-    tile = skin_patch((0, 0, w, h), seed=seed, tone=((246, 226, 212), (198, 150, 128)),
-                      flush=((202, 84, 78), (208, 116, 100)), bumps=int(max(6, w * h / 6200)),
-                      gloss=0.5)
-    td = ImageDraw.Draw(tile)
-    # 五官只给一个大致的落位（近景特写不求写实，但位置固定 → 像素一致）
-    brow_y = h * 0.30
-    for side in (-1, 1):
-        bx0 = w / 2 + side * w * 0.20
-        td.arc([bx0 - 12, brow_y - 12, bx0 + 12, brow_y + 12], 200, 340,
-               fill=(126, 90, 70), width=3)
-    td.line([(w / 2, h * 0.42), (w / 2, h * 0.56)], fill=(178, 132, 112), width=4)
-    td.arc([w / 2 - 22, h * 0.60, w / 2 + 22, h * 0.68], 10, 170, fill=(168, 92, 84), width=5)
+    # 照片本体：真实皮肤纹理照片（优先 TIGAS 真人面部），固定种子可复现
+    tile = load_real_skin_texture(size=(w, h), seed=seed)
     if jitter:
         tile = tile.resize((max(1, int(w / cap)), max(1, int(h / cap))), Image.LANCZOS)
     img.paste(tile, (px, py))
@@ -799,7 +979,7 @@ def make_control_unboxing(out_path: str):
     """负样本 A：真实开箱晒单 —— 有时间线、无修图、正文主动标注赠品。"""
     W, H = 800, 1180
     img, d = _phone(W, H)
-    # 大图：台灯下的真实产品照（木桌面 + 磨砂瓶 + 柔光）
+    # 大图：台灯下的真实产品照（木桌面 + 真实产品照片 + 柔光）
     ph0, ph1 = 130, 706
     d.rounded_rectangle([32, ph0, W - 32, ph1], radius=18, fill=(206, 196, 186))
     shot = Image.new("RGB", (W - 64, ph1 - ph0), (206, 196, 186))
@@ -812,8 +992,15 @@ def make_control_unboxing(out_path: str):
         sd.line([(xx, yy), (xx + 30 + random.random() * 40, yy)], fill=(146, 118, 92))
     soft_ellipse(shot, [60, 20, shot.width - 60, 420], (250, 240, 220), blur=60, alpha=190)
     shot = photo_finish(shot, warmth=1.05, grain=6, vignette=0.20, seed=41)
-    product_bottle(shot, shot.width / 2, 580, 210, 240, (58, 62, 70), (246, 240, 238),
-                   label=("粉底液", "30ml"), accent=(240, 226, 224))
+    # 用真实产品照片替换程序生成的瓶身
+    real_prod = load_real_product(size=(210, 240), variant="control_unbox")
+    if real_prod is not None:
+        px, py = int(shot.width / 2 - 105), int(580 - 240)
+        shadow(shot, (px + 12, py + 230, px + 198, py + 256), blur=14, alpha=95)
+        shot.paste(real_prod, (px, py), _round_corner_mask(210, 240, 16))
+    else:
+        product_bottle(shot, shot.width / 2, 580, 210, 240, (58, 62, 70), (246, 240, 238),
+                       label=("粉底液", "30ml"), accent=(240, 226, 224))
     img.paste(shot, (32, ph0))
     d = ImageDraw.Draw(img)
     _text(d, (W - 62, ph0 + 26), "1/3", font(12, True), (255, 255, 255), "ra")
@@ -849,8 +1036,7 @@ def make_control_complaint(out_path: str):
     img, d = _phone(W, H)
     # 唯一的一张现场照：浴室白光下的泛红特写（无修图）
     d.rounded_rectangle([32, 130, W - 32, 520], radius=18, fill=(232, 226, 222))
-    shot = skin_patch((0, 0, W - 64, 390), seed=77, tone=((250, 232, 220), (214, 172, 152)),
-                      flush=((196, 88, 80), (204, 118, 104)), bumps=26, gloss=0.55)
+    shot = load_real_skin_texture(size=(W - 64, 390), seed=77)
     shot = photo_finish(shot, warmth=1.0, grain=7, vignette=0.24, seed=77)
     img.paste(shot, (32, 130))
     d = ImageDraw.Draw(img)
@@ -891,8 +1077,14 @@ def make_control_repost(out_path: str):
         sd.line([(0, yy), (shot.width, yy)], fill=(178, 152, 124) if i % 3 else (160, 134, 106))
     soft_ellipse(shot, [30, 10, 272, 250], (250, 244, 232), blur=44, alpha=180)
     shot = photo_finish(shot, warmth=1.04, grain=6, vignette=0.20, seed=52)
-    product_bottle(shot, 151, 330, 112, 220, (232, 226, 220), (246, 240, 238),
-                   label=("粉底液", "30ml"))
+    real_prod = load_real_product(size=(112, 220), variant="control_repost")
+    if real_prod is not None:
+        px, py = int(151 - 112 / 2), int(330 - 220)
+        shadow(shot, (px + 6, py + 210, px + 106, py + 236), blur=14, alpha=95)
+        shot.paste(real_prod, (px, py), _round_corner_mask(112, 220, 12))
+    else:
+        product_bottle(shot, 151, 330, 112, 220, (232, 226, 220), (246, 240, 238),
+                       label=("粉底液", "30ml"))
     for i, (pf, name, ts, tag) in enumerate(panels):
         x = 30 + i * 390
         d.rounded_rectangle([x, 60, x + 350, 840], radius=18, fill=(255, 255, 255))
@@ -960,7 +1152,7 @@ def make_same_photo_sidebyside(out_path: str):
     证据就落在「两侧底图逐像素相同」和「滤镜参数单一（整体线性提亮 + 暖色调）」上。
     """
     W, H = 1200, 800
-    random.seed(2404)  # 底图只画一次、两半共用，纹理必须可复现
+    random.seed(2404)
     img = Image.new("RGB", (W, H), (32, 34, 39))
     d = ImageDraw.Draw(img)
     fw, fh = 356, 540
@@ -973,32 +1165,36 @@ def make_same_photo_sidebyside(out_path: str):
     d.rectangle([70, 150, 172, 246], fill=(150, 152, 152))
     d.ellipse([96, 170, 148, 222], fill=(226, 226, 224))
 
-    # 脸（只画一次）
-    base = Image.new("RGB", (fw, fh), (206, 160, 130))
-    bd = ImageDraw.Draw(base)
-    for i in range(26, 0, -1):
-        t = i / 26
-        col = tuple(int((247, 219, 200)[k] * (1 - t) + (203, 156, 126)[k] * t) for k in range(3))
-        bd.ellipse([fw / 2 - 158 * t, fh / 2 - 240 * t,
-                    fw / 2 + 158 * t, fh / 2 + 240 * t], fill=col)
-    bd.ellipse([16, -70, 340, 118], fill=(46, 36, 32))          # 发际
-    bd.ellipse([84, 210, 146, 236], fill=(58, 42, 36))          # 左眼
-    bd.ellipse([210, 210, 272, 236], fill=(58, 42, 36))         # 右眼
-    bd.line([144, 300, 212, 300], fill=(150, 96, 84), width=9)  # 鼻
-    bd.arc([112, 286, 246, 356], 15, 165, fill=(146, 78, 70), width=7)  # 嘴
-    for _ in range(58):                                          # 毛孔
-        a = random.random() * 6.2832
-        rad = random.random() ** 0.5
-        x = fw / 2 + 140 * rad * math.cos(a)
-        y = fh / 2 + 220 * rad * math.sin(a)
-        r2 = 1.6 + random.random() * 2.2
-        bd.ellipse([x - r2, y - r2, x + r2, y + r2], fill=(166, 84, 78))
-    for dx, dy in ((-70, -60), (58, -22), (18, 92), (-30, 168), (86, 140)):  # 痘印
-        bd.ellipse([fw / 2 + dx - 13, fh / 2 + dy - 13,
-                    fw / 2 + dx + 13, fh / 2 + dy + 13], fill=(180, 92, 86))
-    bd.rectangle([fw / 2 - 8, fh / 2 - 100, fw / 2 + 8, fh / 2 + 150], fill=(255, 255, 255))
-
-    edited = Image.blend(base, Image.new("RGB", (fw, fh), (255, 245, 232)), 0.22)  # ← 唯一区别
+    # 真实人脸照片作为基底，左原图 / 右暖色滤镜
+    base = load_real_face(size=(fw, fh), face_id="00002")
+    if base is not None:
+        edited = Image.blend(base, Image.new("RGB", (fw, fh), (255, 245, 232)), 0.22)
+    else:
+        # 兜底：程序生成
+        base = Image.new("RGB", (fw, fh), (206, 160, 130))
+        bd = ImageDraw.Draw(base)
+        for i in range(26, 0, -1):
+            t = i / 26
+            col = tuple(int((247, 219, 200)[k] * (1 - t) + (203, 156, 126)[k] * t) for k in range(3))
+            bd.ellipse([fw / 2 - 158 * t, fh / 2 - 240 * t,
+                        fw / 2 + 158 * t, fh / 2 + 240 * t], fill=col)
+        bd.ellipse([16, -70, 340, 118], fill=(46, 36, 32))
+        bd.ellipse([84, 210, 146, 236], fill=(58, 42, 36))
+        bd.ellipse([210, 210, 272, 236], fill=(58, 42, 36))
+        bd.line([144, 300, 212, 300], fill=(150, 96, 84), width=9)
+        bd.arc([112, 286, 246, 356], 15, 165, fill=(146, 78, 70), width=7)
+        for _ in range(58):
+            a = random.random() * 6.2832
+            rad = random.random() ** 0.5
+            x = fw / 2 + 140 * rad * math.cos(a)
+            y = fh / 2 + 220 * rad * math.sin(a)
+            r2 = 1.6 + random.random() * 2.2
+            bd.ellipse([x - r2, y - r2, x + r2, y + r2], fill=(166, 84, 78))
+        for dx, dy in ((-70, -60), (58, -22), (18, 92), (-30, 168), (86, 140)):
+            bd.ellipse([fw / 2 + dx - 13, fh / 2 + dy - 13,
+                        fw / 2 + dx + 13, fh / 2 + dy + 13], fill=(180, 92, 86))
+        bd.rectangle([fw / 2 - 8, fh / 2 - 100, fw / 2 + 8, fh / 2 + 150], fill=(255, 255, 255))
+        edited = Image.blend(base, Image.new("RGB", (fw, fh), (255, 245, 232)), 0.22)
 
     img.paste(base, (fx, fy))
     img.paste(edited, (fx + 452, fy))
@@ -1032,12 +1228,14 @@ JOBS = [
 ]
 
 def main():
+    global TIGAS_ROOT
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".", help="GlowTrace-MM 数据集根目录")
     ap.add_argument("--tigas", default=None, help="TIGAS_data 目录（含 real/ 与 fake/）")
     ap.add_argument("--only", default=None, help="只重新生成名字里含该子串的图（例如 --only samephoto）")
     a = ap.parse_args()
     root = os.path.abspath(a.root)
+    TIGAS_ROOT = os.path.abspath(a.tigas) if a.tigas else None
     for sub in ("images/real", "images/ai_generated", "images/tampered", "images/mismatch",
                 "texts/real_reviews", "texts/fake_reviews", "texts/mismatched_prompts",
                 "annotations/bboxes", "annotations/rationales"):
